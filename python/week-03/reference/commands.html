@@ -1,0 +1,13 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Commands and debugging card</title><link rel="stylesheet" href="../assets/course.css"></head><body><main><nav aria-label="Reference"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a></nav><h1>Commands and debugging card</h1>
+<p>Project root: <code>/home/an10/code/notes-repo/python/week-03/projects/text-workbench</code>. Use after lessons 2–10; record actual checks in the weekly log.</p>
+<pre><code>uv sync --locked
+uv run text-workbench --help
+uv run pytest tests/test_core.py -q
+uv run pytest -q
+uv run ruff check .
+uv run ruff format --check .
+uv run text-workbench data/normal.txt
+TEXT_MAX_CHARS=1 uv run text-workbench data/normal.txt</code></pre>
+<table><tr><th>Symptom</th><th>First check</th></tr><tr><td>ModuleNotFoundError</td><td>pwd, uv sync, sys.executable, installed package path.</td></tr><tr><td>NotImplementedError</td><td>Expected starter function; implement the current lesson's contract.</td></tr><tr><td>ValidationError</td><td>Which boundary? String conversion, strictness, missing field or extra key?</td></tr><tr><td>Wrong count</td><td>repr(raw), repr(normalized), tokens, raw versus normalized limit.</td></tr><tr><td>No/duplicate logs</td><td>Logger level, handlers, propagation; test stdout and stderr separately.</td></tr><tr><td>File/encoding failure</td><td>Path relative to cwd; explicit UTF-8; isolate using tmp_path.</td></tr><tr><td>Async stalls</td><td>Blocking call or CPU work on the event-loop thread; scheduling versus sequential awaits.</td></tr></table>
+<p>Week root verifier: <code>python maintenance/verify_workspace.py</code>. Git commands start at the notes repository root; see lesson 12 for explicit staging. Use <code>git diff --cached</code> to review before committing.</p>
+</main></body></html>

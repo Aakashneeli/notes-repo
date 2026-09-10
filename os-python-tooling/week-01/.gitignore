@@ -1,0 +1,16 @@
+__pycache__/
+.validation/
+.pytest_cache/
+.venv/
+.env
+practice/terminal/
+practice/permission-demo.txt
+practice/uv-demo/
+practice/remote-lab/
+practice/toolbox-review/
+
+practice/staging-lab/
+practice/conflict-lab/
+practice/output-demo.txt
+practice/greeting-output.txt
+practice/greeting-error.txt

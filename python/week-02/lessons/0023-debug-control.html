@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Follow the return all the way back · Week 2</title><link rel="stylesheet" href="../assets/course.css"><script defer src="../assets/print.js"></script></head><body><main id="top"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../reference/glossary.html">Glossary</a><a href="../plan/README.md">Study sequence</a></nav><p class="eyebrow">Week 02 / Foundation</p><h1>Follow the return all the way back</h1><p class="meta">Read one step, try it, then pause. These are completed teaching examples; proposed repairs and variations are learner exercises.</p>
+<p>A function's result belongs to its caller. Printing is a side effect; return hands back a value and ends the call. Understanding that difference lets your tools be tested without reading a screen.</p>
+<h2>Trace the bug</h2><p>Start in the course root. Create <code>practice/control-attempt.py</code> in your editor, save this deliberately broken teaching example, and run <code>python practice/control-attempt.py</code>.</p><pre><code>def total(sizes):
+    answer = 0
+    for size in sizes:
+        answer += size
+        return answer
+
+print(total([3, 4]))
+print(total([]))</code></pre>
+<p>First call: answer starts at 0; size becomes 3; answer becomes 3; return immediately ends the function. The value 4 is never visited. First output: 3. In the empty call, the loop body never executes and the function falls off the end, returning None. Second output: None. This is legal Python with wrong behavior.</p>
+<h2>Your repair and checks</h2><p>Repair the placement of return so the function gives 7 for [3, 4] and 0 for []. Then run these checks below your function:</p><pre><code>assert total([3, 4]) == 7
+assert total([]) == 0
+assert total([5]) == 5
+print(&quot;three cases passed&quot;)</code></pre><details><summary>Hint 1</summary><p>Which line must run after every item has been visited?</p></details><details><summary>Hint 2</summary><p>Dedent return so it lines up with for, still inside def.</p></details><details><summary>Explained answer · after your attempt</summary><pre><code>def total(sizes):
+    answer = 0
+    for size in sizes:
+        answer += size
+    return answer</code></pre><p>The trace is now 0 → 3 → 7, followed by return. For [], answer stays 0 and the return still executes. The three checks print only “three cases passed” when successful. An assertion failure points to the first mismatch.</p></details>
+<h2>Do not confuse three ways to leave</h2><p><code>continue</code> skips the rest of the current iteration. <code>break</code> exits the loop and permits later function statements. <code>return</code> exits the function. They are not interchangeable fixes for an early exit.</p>
+<p>If total only printed answer, a caller doing <code>result = total([3, 4])</code> would receive None. Keep the core's calculation and the caller's presentation separate, as in the three-tool wrappers.</p>
+<h2>Recall and transfer</h2><p>Close the repair. Recreate it and trace [0, 2, 0]. Then explain why initializing answer inside the loop loses earlier work. Write a check for that bug before trying the deliberate breakage.</p><p class="source">Primary reading: <a href="https://docs.python.org/3/tutorial/controlflow.html">Follow the return all the way back: official documentation</a>. Read the relevant section after your experiment.</p><p>Ask your teacher about anything unclear. Share your prediction, attempt, working directory and actual output. Request one hint at a time.</p><div class="page-nav"><a href="0022-debug-values.html">← Previous step</a><a href="0024-debug-boundaries.html">Next step →</a></div><footer>Use the <a href="../reference/troubleshooting.html">debugging reference</a> and <a href="../weekly-logs/week-02.md">session log</a>. Passing checks is not evidence of independent understanding.</footer></main></body></html>

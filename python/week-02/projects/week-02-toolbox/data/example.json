@@ -1,0 +1,1 @@
+{"service":"ingestion","enabled":true,"retries":2,"tags":["python","backend"]}
