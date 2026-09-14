@@ -1,0 +1,67 @@
+[
+  {
+    "file": "0001-start.html",
+    "title": "Find your starting point",
+    "outcome": "Trace one request and choose only the bridges you need."
+  },
+  {
+    "file": "0002-environment.html",
+    "title": "Run one small mechanism",
+    "outcome": "Prepare the environment and distinguish infrastructure success from learner completion."
+  },
+  {
+    "file": "0003-boundaries.html",
+    "title": "Give each layer one responsibility",
+    "outcome": "Follow data through the package without mixing HTTP, policy and storage."
+  },
+  {
+    "file": "0004-auth.html",
+    "title": "Make access fail closed",
+    "outcome": "Implement a dependency that rejects missing and invalid keys without leaking secrets."
+  },
+  {
+    "file": "0005-uploads.html",
+    "title": "Treat an upload as untrusted bytes",
+    "outcome": "Reject unsupported or oversized content before storing it."
+  },
+  {
+    "file": "0006-storage.html",
+    "title": "Separate client names from storage keys",
+    "outcome": "Store under server-controlled paths and explain partial failures."
+  },
+  {
+    "file": "0007-metadata.html",
+    "title": "Keep metadata durable and queries parameterized",
+    "outcome": "Trace the supplied repository and its atomic claim."
+  },
+  {
+    "file": "0008-states.html",
+    "title": "Make failure visible",
+    "outcome": "Define valid state changes and a bounded retry policy."
+  },
+  {
+    "file": "0009-background.html",
+    "title": "Return acceptance before processing",
+    "outcome": "Use BackgroundTasks while explaining its lifetime and limits."
+  },
+  {
+    "file": "0010-redis-rq.html",
+    "title": "Move scheduling across a process boundary",
+    "outcome": "Explain Redis/RQ and write a concrete migration note; optionally run a local queue."
+  },
+  {
+    "file": "0011-assemble.html",
+    "title": "Assemble the ingestion use case",
+    "outcome": "Implement the project contract one observable slice at a time."
+  },
+  {
+    "file": "0012-security-qa.html",
+    "title": "Probe the boundary as a client",
+    "outcome": "Distinguish CORS, authentication and rate limiting, then test uploads manually."
+  },
+  {
+    "file": "0013-review.html",
+    "title": "Prove ownership and retain it",
+    "outcome": "Debug, explain and vary the complete in-scope work independently."
+  }
+]

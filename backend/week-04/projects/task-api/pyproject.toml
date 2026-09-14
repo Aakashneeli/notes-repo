@@ -1,0 +1,24 @@
+[project]
+name = "week4-task-api"
+version = "0.1.0"
+description = "Learner-owned in-memory API for roadmap Week 4"
+requires-python = ">=3.11,<3.15"
+dependencies = ["fastapi>=0.115,<1", "pydantic>=2.10,<3", "uvicorn>=0.34,<1"]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "httpx>=0.28,<1", "ruff>=0.11,<1"]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["../../practice"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

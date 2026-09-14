@@ -1,0 +1,8 @@
+[project]
+name = "week5-data-workspace"
+version = "0.1.0"
+requires-python = ">=3.11,<3.15"
+dependencies = ["sqlalchemy>=2.0.36,<2.1", "psycopg[binary]>=3.2,<4", "alembic>=1.14,<2", "fastapi>=0.115,<1", "uvicorn>=0.34,<1", "httpx>=0.28,<1", "pytest>=8,<10"]
+[tool.pytest.ini_options]
+pythonpath = ["projects/task-api", "practice"]
+testpaths = ["projects/task-api/tests"]

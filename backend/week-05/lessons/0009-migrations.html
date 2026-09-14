@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>9. Change schema with recorded history — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 09</p><h1>Change schema with recorded history</h1><p class="lede">Inspect and apply a migration without confusing it with editing a model.</p>
+
+<p>A migration is a versioned program that moves a database schema from one state to another. Models describe the desired shape; migration history describes transitions, including how existing rows survive. Alembic records the current revision in alembic_version. A model file alone cannot tell you which transitions a particular database has applied.</p>
+<h2>Run an unrelated completed example first</h2>
+<p>From the weekly root read the supplied <a href="../practice/migration-demo/alembic.ini">demo config</a>, <a href="../practice/migration-demo/env.py">demo runner</a>, and revisions <a href="../practice/migration-demo/versions/0001_labels.py">demo1</a> / <a href="../practice/migration-demo/versions/0002_color.py">demo2</a>. The config points to a script directory; env.py connects only to local w5_demo and runs revisions inside a transaction. demo1 creates labels; demo2 adds a required color with server default gray. These are complete teaching examples, not Task answers.</p>
+<pre><code>export DEMO_DATABASE_URL='postgresql+psycopg://postgres:local-only@127.0.0.1:55435/w5_demo'
+uv run alembic -c practice/migration-demo/alembic.ini upgrade demo1
+psql 'postgresql://postgres:local-only@127.0.0.1:55435/w5_demo' -X -c "INSERT INTO labels(name) VALUES ('before change');"
+uv run alembic -c practice/migration-demo/alembic.ini upgrade head
+psql 'postgresql://postgres:local-only@127.0.0.1:55435/w5_demo' -X -c 'SELECT name,color FROM labels;'
+uv run alembic -c practice/migration-demo/alembic.ini current</code></pre>
+<p>Expect before change/gray and demo2 (head) on a first run. If the demo already has rows or is at demo2, inspect current first and record/reuse it rather than forcing a reset. <code>server_default</code> acts in PostgreSQL, including direct SQL inserts. A Python-side default alone would not backfill existing rows. Adding a required column with no value policy can fail when old rows exist.</p>
+<h2>Inspect rollback before running it</h2>
+<p>demo2's downgrade drops color: it cannot reconstruct customized color values later. On this disposable demo only, after noting current values, run <code>uv run alembic -c practice/migration-demo/alembic.ini downgrade -1</code>, inspect <code>\d labels</code> in w5_demo, then upgrade head again. The name survives, but a former custom color becomes gray. This is why a schema rollback isn't a data recovery plan. Never blindly downgrade your learner project or shared data; first inspect what will be lost and whether a forward corrective migration is safer.</p>
+<h2>Your persistent project</h2>
+<p>Read <a href="../projects/task-api/alembic.ini">project alembic.ini</a>, <a href="../projects/task-api/migrations/env.py">migrations/env.py</a>, <a href="../projects/task-api/migrations/script.py.mako">script.py.mako</a> and <a href="../projects/task-api/migrations/versions/README.md">versions/README.md</a>. Leave runner/template infrastructure unchanged. The Mako placeholders fill the generated revision; they are not Python syntax you should paste into models. env.py imports Base.metadata, reads DATABASE_URL and supports online execution or offline SQL generation. It imports models.py, so all mapped classes must be registered there.</p>
+<pre><code>source practice/local.env.example
+uv run alembic -c projects/task-api/alembic.ini revision --autogenerate -m "create task storage"
+uv run alembic -c projects/task-api/alembic.ini upgrade head
+uv run alembic -c projects/task-api/alembic.ini current
+uv run alembic -c projects/task-api/alembic.ini history
+psql "$W5_PSQL_URL" -X -c '\d tasks'</code></pre>
+<p>Pause between revision and upgrade: open the new versions/*.py and inspect every operation, constraint name and downgrade. Empty models produce an empty candidate, not a completed deliverable. Autogeneration can mistake renames for drop/add and cannot decide data backfills. Compare the candidate with your design. Don't edit already-applied history to patch later changes; create a new revision.</p>
+<details><summary>Hint for safe growth</summary><p>A nullable new field can preserve old rows; making it required may need adding it nullable, backfilling known values, then setting NOT NULL. The data policy is a design decision, not a generated answer.</p></details>
+<details><summary>Check for schema drift</summary><p>If the class has a column but psql doesn't, check destination and current revision before debugging the query. create_all does not substitute for migration of existing tables.</p></details>
+<p>Use <a href="../templates/migration-note.md">templates/migration-note.md</a> to append real observations in <a href="../projects/task-api/migration-notes.md">migration-notes.md</a>. Next implement and check a single API create/read slice, then expand. Independent variation: explain which values survive demo2 down/up and prove it on the demo.</p>
+<p class="source">Primary reading: <a href="https://alembic.sqlalchemy.org/en/latest/autogenerate.html">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="0008-sessions.html">← Previous</a><a href="0010-persistent-api.html">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

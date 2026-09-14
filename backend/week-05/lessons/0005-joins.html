@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>5. Keep the author with no articles — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 05</p><h1>Keep the author with no articles</h1><p class="lede">Explain join cardinality and a zero-inclusive grouped count.</p>
+
+<p>A relationship is stored as values: articles.author_id refers to authors.id. A join uses that match to produce combined rows. If Asha has two matching articles, her name appears twice. This isn't unwanted duplication caused by SQL; it is the result's one-row-per-match shape.</p>
+<pre><code>SELECT a.name,b.title
+FROM authors AS a
+JOIN articles AS b ON b.author_id=a.id
+ORDER BY a.id,b.id;</code></pre>
+<p><code>AS a</code> and <code>AS b</code> are aliases, short names within this query. <code>a.id</code> means the author's ID, not the article ID. Match Asha to 1 and 2; match Ben to 3. Chen has no match; Draft has no author. The inner join returns three rows. Missing ON can create a cross product—every author paired with every article—which changes both results and counts.</p>
+<h2>Trace LEFT JOIN before counting</h2>
+<pre><code>SELECT a.name,count(b.id) AS n
+FROM authors AS a
+LEFT JOIN articles AS b ON b.author_id=a.id
+GROUP BY a.id,a.name
+ORDER BY a.id;</code></pre>
+<p>The left join keeps every author. Before grouping its rows are Asha/1, Asha/2, Ben/3, Chen/NULL. GROUP BY collects each author's matches. COUNT(b.id) counts non-NULL IDs: Asha 2, Ben 1, Chen 0. COUNT(*) counts result rows instead and gives Chen 1 because the placeholder row exists. Group by the stable author key as well as name so two equal display names wouldn't be merged accidentally in another schema.</p>
+<p>WHERE filters rows before grouping; HAVING filters groups after aggregation. Add <code>HAVING count(b.id) &gt;= 2</code> before ORDER BY to keep Asha alone. Do not write aggregate count in WHERE; that stage doesn't yet have the grouped count.</p>
+<h2>A subtle failure</h2>
+<p>Adding <code>WHERE b.published=true</code> to a left join removes Chen: the synthetic NULL row doesn't satisfy the filter. To count published articles while preserving all authors, move this condition into ON: <code>ON b.author_id=a.id AND b.published=true</code>. Matching is restricted before the left join adds an unmatched author row. Expected counts are Asha 1, Ben 1, Chen 0.</p>
+<p>From the weekly root, run <code>psql "$W5_PSQL_URL" -X -f practice/worked.sql</code> again and inspect the second result. Then edit <code>author_counts()</code> in practice/exercises.py and run <code>uv run pytest practice/test_exercises.py -q -k counts</code>. Write the SQL from the explanation before opening the answer.</p>
+<details><summary>First hint</summary><p>Start with authors on the left; count article IDs, not all rows. Group by author ID/name and sort by author ID.</p></details>
+<details><summary>Explained beginner answer</summary><pre><code>return """SELECT a.name,count(b.id) AS n
+FROM authors a LEFT JOIN articles b ON b.author_id=a.id
+GROUP BY a.id,a.name ORDER BY a.id"""</code></pre><p>The left side determines which empty entities survive. A count test containing no empty author could accept the wrong COUNT(*) implementation, which is why Chen is supplied.</p></details>
+<p>Complete Q11–Q16 in queries.sql and record observations in sql-notes.md. Then try the published-only variation independently in an interactive seeded psql connection, using lesson 4's navigation. Explain why two visually similar queries differ. For a real PostgreSQL check run <code>uv run pytest practice/test_postgres.py -q -k left_join</code> after lesson 2's environment setup. It compares both correct and deliberately wrong counts. Next, connect multiple writes with a transaction.</p>
+<p class="source">Primary reading: <a href="https://www.postgresql.org/docs/current/tutorial-agg.html">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="0004-constraints.html">← Previous</a><a href="0006-transactions.html">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

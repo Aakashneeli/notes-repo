@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HTTP and FastAPI glossary</title><link rel="stylesheet" href="../assets/course.css"><script src="../assets/print.js" defer></script></head><body><main><nav aria-label="Course"><a href="../index.html">Week 4 study desk</a><a href="../plan/file-map.html">File guide</a></nav><p class="eyebrow">Week 04 / FastAPI</p><h1>HTTP and FastAPI glossary</h1><p>Use when a term in a lesson blocks understanding; read, do not fill in. Return to the active lesson after lookup.</p><dl>
+<dt>HTTP request / response</dt><dd>Client message and server reply: method/target versus status, each with headers and possibly a body.</dd>
+<dt>Resource / representation</dt><dd>The named thing (/tasks/1) versus its transmitted description (JSON fields).</dd>
+<dt>Route / router</dt><dd>A method/path handler mapping; a router groups mappings under a prefix.</dd>
+<dt>Path / query / header / body</dt><dd>Resource identifier in the URL path; selection options after ?; message metadata; payload bytes.</dd>
+<dt>Schema / validation / serialization</dt><dd>A data contract; checking/converting input against it; encoding values for transmission.</dd>
+<dt>Dependency / injection</dt><dd>A callable that supplies a value or enforces a condition; the framework arranges the call and provides its result.</dd>
+<dt>Authentication / authorization</dt><dd>Recognizing a credential/identity; deciding which actions that identity may perform.</dd>
+<dt>In-memory / app factory / lifespan</dt><dd>State held only in this process; a function constructing a fresh app; setup and cleanup around its running lifetime.</dd>
+<dt>ASGI / Uvicorn</dt><dd>The Python interface between asynchronous servers and apps; the server used here to serve that app over HTTP.</dd>
+<dt>Offset / limit / total</dt><dd>Matching rows skipped; maximum returned; matching count before slicing.</dd>
+<dt>Test fixture / regression</dt><dd>Controlled setup/cleanup reused by tests; a check preventing recurrence of a demonstrated bug.</dd>
+<dt>OpenAPI / Swagger UI / Postman</dt><dd>Machine-readable API description; interactive browser documentation; client for saved manual requests/checks.</dd>
+<dt>Omitted / null / false</dt><dd>No field supplied; an explicit empty JSON value; a concrete boolean value. Do not treat them as interchangeable.</dd></dl>
+<p><a href="../lessons/0003-http-message.html">HTTP lesson</a> · <a href="../lessons/0005-schemas-and-partial-updates.html">Schema lesson</a></p></main></body></html>

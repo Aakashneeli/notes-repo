@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>3. Predict a filtered page — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 03</p><h1>Predict a filtered page</h1><p class="lede">Write a SELECT whose rows and order you can predict.</p>
+
+<p>A table has named columns and rows. A SQL query describes which rows you want; PostgreSQL chooses how to fetch them. For reasoning, read a simple query as source rows → filter → choose columns → order → take a page. This reasoning order is not a promise about its physical execution plan.</p>
+<p>From the weekly root read <a href="../practice/seed.sql">practice/seed.sql</a>, the supplied sample authors/articles. Asha has articles 1 and 2; Ben has 3; Chen has none; article 4 has no author. <code>published</code> is true for 1 and 3. Seed uses <code>TEMP</code> tables: they exist only in that connection, so project tables are untouched. Read <a href="../practice/worked.sql">worked.sql</a> and run:</p>
+<pre><code>psql "$W5_PSQL_URL" -X -f practice/worked.sql</code></pre>
+<p><code>-f</code> executes a file; <code>\ir seed.sql</code> loads a file relative to that script. <code>ON_ERROR_STOP</code> stops scripts on SQL errors. Without it, a later success can hide an earlier failure. The first output is <code>1 | SQL notes</code>. The later outputs are explained in lessons 5 and 6; don't count this supplied query as your own.</p>
+<pre><code>SELECT id,title FROM articles
+WHERE published = true
+ORDER BY id
+LIMIT 1;</code></pre>
+<p>Rows 1 and 3 pass the filter; only id/title are returned; ordering puts 1 first; limit retains it. Removing ORDER BY means SQL doesn't promise which qualifying row comes first. <code>OFFSET 1 LIMIT 1</code> after that order would return article 3. Page counts must count the filtered set before applying the limit.</p>
+<h2>Missing is not false</h2>
+<p><code>NULL</code> represents absent/unknown data, not zero, false or empty text. <code>author_id = NULL</code> doesn't evaluate true even on an unassigned row. Use <code>author_id IS NULL</code>. A filter retains only true expressions; false and unknown are discarded. SQL strings use single quotes: <code>title = 'Draft'</code>. Double quotes identify names, so <code>"Draft"</code> means a column named Draft.</p>
+<h2>Guided practice with immediate feedback</h2>
+<p>Still at the weekly root, read <a href="../practice/exercises.py">practice/exercises.py</a> and <a href="../practice/test_exercises.py">its checks</a>. Edit only <code>published_page()</code>, returning a SQL string using <code>:published</code>. The checker binds true and false separately, so interpolating a fixed true answer will fail. Run:</p>
+<pre><code>uv run pytest practice/test_exercises.py -q -k page</code></pre>
+<p>The unfinished function intentionally raises NotImplementedError. A passing check returns IDs 1,3 for true and 2,4 for false. These checks use disposable SQLite for portable SQL feedback; they do not prove PostgreSQL transaction or migration behavior. A <code>:name</code> placeholder is SQLAlchemy text syntax; parameters travel separately from the SQL text so input cannot become SQL instructions.</p>
+<details><summary>Hint 1</summary><p>Start with SELECT id,title FROM articles. Add WHERE published=:published, then ordering and limit.</p></details>
+<details><summary>Explained beginner answer</summary><pre><code>return "SELECT id,title FROM articles WHERE published=:published ORDER BY id LIMIT 2"</code></pre><p>The variable controls the filter, not the SQL structure. Do not put quotes around the placeholder. Close this answer and reconstruct it before recording success.</p></details>
+<p>Read <a href="../practice/sql-lab.md">sql-lab.md</a>; edit Q01–Q10 in <a href="../practice/queries.sql">queries.sql</a>. Record predictions, SQL, observations and help in <a href="../practice/sql-notes.md">sql-notes.md</a>. Run <code>psql "$W5_PSQL_URL" -X -f practice/queries.sql</code>. It creates fresh TEMP samples each time. Use the lab's expected rows for feedback.</p>
+<p>Independent variation: select unpublished assigned articles, descending id, one row. Predict article 2 before running. Record why Draft is excluded. Next, make one controlled write and explain which rule can reject it.</p>
+<p class="source">Primary reading: <a href="https://www.postgresql.org/docs/current/tutorial-select.html">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="0002-local-database.html">← Previous</a><a href="0004-constraints.html">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

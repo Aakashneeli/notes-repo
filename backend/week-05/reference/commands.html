@@ -1,0 +1,13 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Commands and recovery — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head><body><main><nav><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a></nav><h1>Commands and recovery</h1><p>All commands below start in <code>/home/an10/code/notes-repo/backend/week-05</code>. Setup is taught in lesson 2; do not execute schema changes until lesson 9's review.</p><pre><code>uv sync --locked
+source practice/local.env.example
+psql "$W5_PSQL_URL" -X
+# Inside psql:
+\conninfo
+\d tasks
+\q
+# Back in Bash:
+uv run pytest practice/test_examples.py -q
+uv run pytest practice/test_postgres.py -q
+uv run alembic -c projects/task-api/alembic.ini current
+uv run alembic -c projects/task-api/alembic.ini history
+uv run uvicorn --app-dir projects/task-api app:create_app --factory --port 8055</code></pre><p>Inside a failed SQL transaction, ROLLBACK ends the aborted state. Missing table: check database identity and migrations. Session already begun: find the prior automatic transaction, not just the latest begin. Duplicate title: preserve the unique constraint and handle its violation after rollback. A missing API route or TODO means learner implementation is pending.</p><p>Stop/restart your lab with <code>docker stop notes-week05-db</code> / <code>docker start notes-week05-db</code>. Never delete .local/postgres as a troubleshooting shortcut. Keep generated storage/caches out of commits.</p><footer>Read for quick recall; definitions are supplied teaching aids, not evidence of learner mastery.</footer></main></body></html>

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>1. Start from evidence, not a week number — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 01</p><h1>Start from evidence, not a week number</h1><p class="lede">Identify the one prerequisite gap that would block database work.</p>
+
+<p>Your mission is to own durable backend state. In Week 4 a process-local dictionary would forget tasks when the process stopped. This week a separate PostgreSQL server owns stored rows; Python sends commands over a connection. A restarted API reconnects to the same database. Stopping a process and deleting database storage are very different operations.</p>
+<p>The source is exactly numbered Week 5, “PostgreSQL, SQL, SQLAlchemy/SQLModel, Alembic, and Data Modeling.” Its deliverables are persistence, migrations, integration tests, an ER diagram, migration notes and twenty queries you write. The <a href="../roadmap/source-week-05.md">source note</a> records this mapping; read it once. Read <a href="../MISSION.md">MISSION.md</a> for purpose and <a href="../AI-USAGE.md">AI-USAGE.md</a> for how to ask for hints. These are tutor-maintained agreements, not homework answers.</p>
+<h2>Three probes before setup</h2>
+<pre><code>def rename(row, title):
+    changed = dict(row)
+    changed["title"] = title
+    return changed
+
+old = {"id": 7, "title": "Read"}
+new = rename(old, "Write")
+print(old["title"], new["title"])</code></pre>
+<p>Predict the output, explain what <code>return</code> hands back, and explain why the original stays unchanged. Then explain what a POST body and a 404 response mean. Finally predict why two separately started Python processes do not share the same dictionary.</p>
+<details><summary>First hint</summary><p><code>dict(row)</code> makes a shallow copy. These values are integers/strings, so the copied mapping can replace its title without changing old. A function call receives a return value; it does not automatically print it.</p></details>
+<details><summary>Check and reasoning</summary><p>The output is <code>Read Write</code>. POST commonly submits new data in a request body; 404 means the requested resource was not found. Each process has its own memory. A shared database gives both processes a common storage service, but they still need concurrency rules.</p></details>
+<p>If the Python probe blocks you, use the needed lesson in <a href="../../../python/week-02/index.html">index</a>, or ask your tutor to trace this example. For HTTP, revisit <a href="../../week-04/lessons/0003-http-message.html">Week 4's message lesson</a>; for returned data and mutation use <a href="../../week-04/lessons/0006-memory-and-crud.html">memory and CRUD</a>. No earlier workspace is proof that you mastered it.</p>
+<h2>Begin an honest record</h2>
+<p>Starting at the repository root, run <code>cd backend/week-05</code> then <code>pwd</code>; the result must end in <code>/backend/week-05</code>. Read <a href="../README.md">README.md</a>, then <a href="../plan/README.md">the flexible sequence</a>. Open and edit <a href="../weekly-logs/week-05.md">weekly-logs/week-05.md</a>: record your three predictions and any help. In <a href="../plan/progress.md">plan/progress.md</a> fill only “next small task”; leave mastery boxes unchecked until you have evidence.</p>
+<p>The <a href="../index.html">study desk</a> links every work area. <a href="../plan/file-map.html">The file-to-lesson map</a> tells you when each supplied file becomes useful. You do not need to memorize it. <a href="../NOTES.md">NOTES.md</a>, coverage and validation are tutor records: read when useful, preserve earlier evidence. The tutor creates learning records only after demonstrated understanding or a disclosed baseline change. Today nothing is recorded as learned.</p>
+<p>Read <a href="../reference/vocabulary.html">reference/vocabulary.html</a> only when a new term blocks an explanation; it is a supplied teaching aid, not your mastery record. Use <a href="../reference/commands.html">reference/commands.html</a> to recall a command after its lesson has introduced it. Both use the shared assets/course.css component; leave that infrastructure unchanged while studying.</p>
+<h2>Small transfer</h2><p>Close the example and change it to toggle <code>done</code> while retaining the original row. Explain whether this makes data survive a restart. Save your answer in the same weekly log, then move to setup.</p>
+<p class="source">Primary reading: <a href="https://www.postgresql.org/docs/current/tutorial-concepts.html">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="../index.html">← Previous</a><a href="0002-local-database.html">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

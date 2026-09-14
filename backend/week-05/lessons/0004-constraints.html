@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>4. Make one valid write — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 04</p><h1>Make one valid write</h1><p class="lede">Use keys and constraints to keep invalid rows out of storage.</p>
+
+<p>API validation gives callers useful feedback, but scripts and other services can bypass it. Database constraints protect all writers. A primary key identifies a row uniquely and cannot be NULL. A foreign key requires a non-NULL reference to identify an existing parent. A unique constraint prevents duplicate values; a NOT NULL constraint forbids absence; a CHECK rejects a false condition. A CHECK alone does not reject unknown, so combine it with NOT NULL when absence is invalid.</p>
+<p>In seed.sql, article id is a primary key and author_id references authors.id. The nullable author_id permits an unassigned draft. A title is required and nonblank. A Python dictionary key isn't a database foreign key; it doesn't make the server enforce any relationship.</p>
+<h2>Trace one write</h2>
+<p>At the weekly root start an interactive connection and load temporary samples:</p>
+<pre><code>psql "$W5_PSQL_URL" -X
+\i practice/seed.sql
+BEGIN;
+INSERT INTO articles (id,author_id,title) VALUES (5,3,'Local note')
+RETURNING id,published,views;
+UPDATE articles SET views=views+2 WHERE id=5 RETURNING views;
+DELETE FROM articles WHERE id=5 RETURNING id;
+ROLLBACK;</code></pre>
+<p>Type these at the psql prompt, not Bash. INSERT supplies three columns; defaults fill false and zero. RETURNING reports the stored row, giving <code>5 | f | 0</code>. UPDATE calculates from the current stored views, giving 2. DELETE removes only id 5 and reports 5. ROLLBACK undoes the transaction; the temporary setup is still available. Exit psql with <code>\q</code>.</p>
+<p><code>WHERE</code> matters on writes: without it every row is updated/deleted. Preview the same filter using SELECT and check affected rows. UPDATE returning zero rows isn't a SQL error; at the API boundary you may need to interpret it as “not found.” Specifying column names protects an INSERT from depending on physical column order.</p>
+<h2>Fail on purpose in the temporary sample</h2>
+<p>In the same sample connection, outside an explicit transaction, attempt <code>INSERT INTO articles (id,author_id,title) VALUES (9,999,'Orphan');</code>. Expect a foreign-key error; there is no author 999. Try a blank title and expect a check violation. Try an existing id and expect a primary-key violation. Each failed standalone statement leaves no new row. Inside BEGIN, the first failure instead leaves the transaction aborted until ROLLBACK; lesson 6 traces that state.</p>
+<details><summary>Hint: why checking first is insufficient</summary><p>Two clients can both SELECT and see no duplicate title before either inserts. A database UNIQUE rule arbitrates when the writes race. The loser must handle the violation and roll back.</p></details>
+<details><summary>Explain the NULL case</summary><p>An unassigned article is allowed because author_id is nullable. The foreign key checks actual references, not absent ones. Making author_id NOT NULL would change the product rule: every article must have an author.</p></details>
+<h2>Apply with less help</h2>
+<p>Return to Bash in the weekly root. Complete Q17–Q20 in queries.sql, keeping the final supplied ROLLBACK. Run the script and compare its RETURNING rows against sql-lab.md. Leave uncompleted Q labels as comments. Write one rejected insert and explain the relevant constraint in sql-notes.md; rejected experiments do not replace the twenty requested valid queries.</p>
+<p>For your project, choose and later document what happens to events when a task is deleted. Restrict prevents deleting the parent; cascade removes dependent rows. Neither is universally correct. A learning event history can cascade; an audit record required after deletion would need another policy. Variation: make a nullable note column required in a temporary table and predict what happens to existing NULL rows. Next, combine rows without accidentally losing empty parents.</p>
+<p class="source">Primary reading: <a href="https://www.postgresql.org/docs/current/ddl-constraints.html">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="0003-select.html">← Previous</a><a href="0005-joins.html">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

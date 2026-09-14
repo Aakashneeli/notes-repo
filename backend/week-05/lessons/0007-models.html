@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>7. Read a mapped Python class — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 07</p><h1>Read a mapped Python class</h1><p class="lede">Translate each ORM declaration into a database rule.</p>
+
+<p>An ORM maps Python objects to relational rows. It doesn't remove SQL: attributes become column values, a query becomes SQL, and constraints still run in PostgreSQL. This week chooses SQLAlchemy 2.0, one of the source's allowed paths. Pydantic describes accepted/returned HTTP data; an ORM class describes persistent storage. Keeping those roles separate helps you notice rules that must exist in both layers.</p>
+<p>From the weekly root read <a href="../practice/orm_example.py">practice/orm_example.py</a>, a completed label example unrelated to the Task project. Focus first on its declarations:</p>
+<pre><code>class Base(DeclarativeBase):
+    pass
+
+class Label(Base):
+    __tablename__ = "example_labels"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(40), unique=True)</code></pre>
+<p><code>class Label(Base)</code> inherits the mapping behavior registered by Base. <code>__tablename__</code> names the SQL table. The annotation <code>Mapped[int]</code> says this attribute is managed by the ORM and holds an integer. <code>mapped_column</code> adds storage options. Non-optional mapped types infer NOT NULL here; the primary key also forbids NULL. String(40) describes a length bound in PostgreSQL. SQLite does not enforce this length identically; the teaching example is not a backend-compatibility test.</p>
+<p><code>Base.metadata</code> collects table descriptions. It is a Python description, not the actual database. Editing the class does not modify an existing table. The example uses <code>create_all</code> solely to construct a disposable in-memory sample. The persistent project must use migrations instead.</p>
+<h2>Express a rule and a reference</h2>
+<pre><code># Focused excerpt for an unrelated Article model:
+author_id: Mapped[int | None] = mapped_column(ForeignKey("authors.id"))
+__table_args__ = (
+    UniqueConstraint("title", name="uq_articles_title"),
+    CheckConstraint("length(trim(title)) &gt; 0", name="ck_articles_title"),
+)</code></pre>
+<p>This excerpt belongs inside a mapped class with a title column and an existing mapped authors table; it is not a standalone program. The string authors.id identifies table.column. None permits an unassigned article; removing None requires a reference. The tuple groups table rules, and its commas separate objects. Constraint names make migration changes and precise error handling possible. A CHECK on title still needs NOT NULL on the column if missing text is forbidden.</p>
+<p>Object navigation can be added with <code>articles: Mapped[list["Article"]] = relationship(back_populates="author")</code> on Author and <code>author: Mapped["Author | None"] = relationship(back_populates="articles")</code> on Article. Import relationship from sqlalchemy.orm. The quoted forward name lets a declaration refer to a class defined later. back_populates names the attribute at the opposite end, not a table. A list means many related objects. Accessing a relationship may execute another SELECT, so don't rely on lazy loading after closing the session. See the <a href="https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html">official relationship patterns</a> for the complete declaration context.</p>
+<h2>Trace object to row</h2>
+<p><code>Label(name="draft")</code> first creates a Python object. <code>session.add(item)</code> schedules it for persistence. After flush, the INSERT has run and its generated ID is available. Before flush, you must not assume the ID exists. Closing Python loses that object; a later SELECT can reconstruct another object representing the same stored row.</p>
+<p>Run <code>uv run python practice/orm_example.py</code> from the weekly root. It prints flushed 1, committed ['draft'], rolled back, remaining ['draft']. Lesson 8 explains the transaction parts. Read <a href="../practice/test_examples.py">test_examples.py</a> and run <code>uv run pytest practice/test_examples.py -q</code>; this instructor check verifies that exact trace. Keep example and check unchanged; use the lesson's tiny variations in your notes rather than rewriting supplied evidence.</p>
+<h2>Transfer to your tables</h2>
+<p>Read <a href="../projects/task-api/README.md">the project contract</a> and <a href="../projects/task-api/models.py">models.py</a>. It supplies only Base; you implement Task and TaskEvent. Draw a small row example on paper before declaring attributes. A task can have many events; each event references one task. The database foreign key and an ORM relationship are distinct: a ForeignKey enforces references, while relationship gives convenient object navigation. You can query with explicit joins even before adding relationship navigation.</p>
+<p>Vocabulary for your implementation: import <code>ForeignKey</code>, <code>CheckConstraint</code> and <code>UniqueConstraint</code> from sqlalchemy. A table-level <code>__table_args__</code> tuple holds named rules. <code>ForeignKey("tasks.id", ondelete="CASCADE")</code> is one possible deletion policy; justify it before use. An annotation such as <code>Mapped[str | None]</code> permits NULL unless explicitly overridden. Choose required fields deliberately; a default is not a substitute for NOT NULL.</p>
+<details><summary>Hint: represent a related row</summary><p>An unrelated example is Comment.article_id declared as an integer column with ForeignKey("articles.id"). It stores the integer key, not an entire Article object. Use that mechanism for your event reference.</p></details>
+<details><summary>Check: what survives a model edit?</summary><p>The existing table keeps its old structure until migration SQL changes it. Autogeneration compares metadata and database; it doesn't mean “the class was saved, therefore schema is updated.”</p></details>
+<p>Independent variation: describe an optional label description and the difference between omitted input, Python None and SQL NULL. Record your proposed Task rules in schema-design.md, then start implementing models.py. Do not mark them verified until migrations and direct-database constraint checks run. Next, decide who owns the transaction.</p>
+<p class="source">Primary reading: <a href="https://docs.sqlalchemy.org/en/20/orm/quickstart.html">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="0006-transactions.html">← Previous</a><a href="0008-sessions.html">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

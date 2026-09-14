@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>14. Prove ownership after the hints close — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 14</p><h1>Prove ownership after the hints close</h1><p class="lede">Collect independent evidence and leave a reproducible project.</p>
+
+<p>The material is ready when its mechanisms are taught and checked. Your learning is demonstrated when you can implement, test, debug, explain and vary them independently. Reading every lesson or passing a supplied example test does not complete this week.</p>
+<h2>Recall before reopening</h2>
+<p>Use <a href="../templates/review.md">templates/review.md</a> fields in weekly-logs/week-05.md. Close notes and answer the source's four questions: Why these tables/relationships? What happens when two writes overlap? What query does this endpoint execute? What breaks when an index or constraint is removed? Include a concrete row/transaction example for each. Then compare with your actual code, diagram and output.</p>
+<p>Revisit after roughly one, three and seven days; the intervals are flexible. Interleave one SQL prediction with one API failure diagnosis. If an explanation depends on seeing the answer, record that and retry a smaller variation later. Ask your tutor to challenge an explanation or provide one hint, not finish the repository.</p>
+<h2>Run the right checks</h2>
+<p>Starting at the weekly root, read <a href="../VALIDATION.md">VALIDATION.md</a> for what the author actually verified and <a href="../maintenance/verify_workspace.py">maintenance/verify_workspace.py</a> for its limited local-link/file-map audit. Run:</p>
+<pre><code>python maintenance/verify_workspace.py
+uv run pytest practice/test_examples.py -q
+uv run pytest practice/test_exercises.py -q
+source practice/local.env.example
+uv run pytest practice/test_postgres.py -q
+uv run pytest projects/task-api/tests -q</code></pre>
+<p>Passing maintenance checks proves navigation and syntax checks only. Passing instructor examples proves supplied mechanisms in their environment. Passing your project suite supplies behavioral evidence, still supplemented by manual restart, concurrency, diagram and explain-back evidence. Leave infrastructure defects, expected starter failures and independent learner success distinct.</p>
+<p>Use <a href="../plan/assessment.md">assessment.md</a> as the completion checklist and <a href="../plan/coverage.md">coverage.md</a> to find evidence for every requirement. Update plan/progress.md with specific links, not “done because tests green.” Confirm all twenty Q labels contain your queries and observations. Fill the project's README run instructions and actual migration/index/relationship decisions. Keep unfinished deliverables visibly pending.</p>
+<h2>Review changes before a local commit</h2>
+<p>From the weekly root run:</p>
+<pre><code>git status --short
+git diff -- projects/task-api/models.py projects/task-api/repository.py
+git diff --check</code></pre>
+<p>Paths are relative to your current directory. An untracked file won't appear in normal git diff; inspect it directly before staging. Select only the files you intend to commit, for example <code>git add -- projects/task-api/models.py projects/task-api/repository.py</code>, then <code>git diff --cached</code>. Check the staged file list with <code>git diff --cached --name-only</code>; existing staged changes may belong to other work. If the complete staged set is intentional, make your own local commit and record its ID. This lesson does not require push, PR creation or publishing.</p>
+<p>Migration source and learner notes belong in Git; .local database storage, .venv, caches and real credentials do not. .gitignore does not remove a secret already tracked. If you notice one, stop and get help handling the actual exposure instead of merely adding another ignore rule.</p>
+<h2>A small independent variation</h2>
+<p>Add an optional due_date to your own project without copying an implementation: choose API validation, model column, migration for existing rows and tests. Predict whether absent old values remain valid. Make it work on both a fresh schema and the current dev schema, retaining existing tasks. Explain the change after closing the files. This is a transfer assessment, not a new week or a provided finished feature.</p>
+<details><summary>Hint only if blocked</summary><p>Start with the stored meaning and old-row policy, then schema transition, then input/output behavior. A date is not arbitrary text; use the relevant Python/database date types and validate boundary cases.</p></details>
+<details><summary>Check what counts as success</summary><p>An existing row with no due date survives migration, invalid date input is rejected, and your changed API still passes old behavior checks. You can explain how absent differs from explicit clearing if your PATCH contract permits it.</p></details>
+<p>For optional human perspective, use the communities in <a href="../RESOURCES.md">RESOURCES.md</a> to ask a narrowly scoped, sanitized design question yourself. No external action is required for completion. Finish by choosing your next retrieval date and naming any unresolved gap honestly.</p>
+<p class="source">Primary reading: <a href="https://git-scm.com/docs/git-diff">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="0013-diagram-and-reading.html">← Previous</a><a href="../plan/assessment.md">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

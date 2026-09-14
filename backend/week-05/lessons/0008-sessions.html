@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>8. Put the transaction at the boundary — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 08</p><h1>Put the transaction at the boundary</h1><p class="lede">Use a session without committing half an operation.</p>
+
+<p>The Engine holds connection configuration and pooling. A Session coordinates ORM work and a transaction; it is not a global dictionary and must not be shared by concurrent requests. A repository groups queries for a domain operation. Its purpose here is to keep HTTP parsing out of SQL and let one outer boundary commit a complete operation.</p>
+<h2>Read the complete label example</h2>
+<pre><code>with Session(engine) as session:
+    with session.begin():
+        item = Label(name="draft")
+        session.add(item)
+        session.flush()
+        print("flushed", item.id)</code></pre>
+<p><code>with</code> calls a context manager's entry and exit behavior. The outer context closes the session. The inner context begins a transaction, commits on normal exit and rolls back when an exception escapes. Flush sends pending INSERT/UPDATE/DELETE statements and obtains generated values. Another connection must not rely on those uncommitted writes yet. A commit can still fail after flush, so don't return success before transaction exit.</p>
+<p>The example's later transaction adds review and duplicate draft. The uniqueness failure causes the whole transaction to roll back, including review. Catch IntegrityError outside the transaction context so rollback has run. Afterwards a fresh SELECT sees draft alone. The example calls rollback after its first SELECT because even a read automatically begins a transaction; calling begin again without ending it raises “a transaction is already begun.”</p>
+<h2>A query is built, then executed</h2>
+<pre><code>statement = select(Label).where(Label.name == "draft")
+row = session.scalars(statement).one_or_none()</code></pre>
+<p><code>Label.name == "draft"</code> builds a SQL expression rather than comparing two ordinary Python strings. <code>scalars</code> extracts each result's first selected entity/value. <code>one_or_none</code> gives None for no row and raises if multiple rows violate the expected shape. You still need to translate “no row” to your domain's missing-resource behavior. Avoid mixing Python <code>and</code> with SQL expressions; pass conditions to where separately or use SQLAlchemy's operators.</p>
+<h2>A stopping point: update, delete and page a tiny table</h2>
+<p>Before the project, read <a href="../practice/orm_crud.py">practice/orm_crud.py</a>, a completed label-only example. From the weekly root run <code>uv run python practice/orm_crud.py</code>. It prints <code>page 3 ['review']</code>, then <code>remaining ['private', 'ready']</code>. Each begin block is a separate complete operation; the example deliberately finishes one before starting another.</p>
+<pre><code>total = session.scalar(select(func.count()).select_from(Label))
+names = session.scalars(
+    select(Label.name).order_by(Label.id).offset(1).limit(1)
+).all()
+row = session.scalars(select(Label).where(Label.name == "draft")).one()
+row.name = "private"
+session.delete(other_row)</code></pre>
+<p>These snippets show mechanisms from separate transactions; do not paste them as one unguarded script. func.count builds SQL COUNT; select_from names the table being counted. scalar gives the single count value. The page excludes its first row and returns one name; its size is one while total is three. Assignment to an attached object's mapped attribute marks it changed; the next flush writes UPDATE. session.delete marks a loaded object for DELETE at flush. Neither call commits by itself. Querying with one() raises when no match exists; a user-facing lookup often needs one_or_none() and a deliberate missing branch instead.</p>
+<p>Guided variation: predict the page at offset 2. Starting at the weekly root, run <code>cp -n practice/orm_crud.py .local/orm_variation.py</code>, edit that copy's offset, then run <code>PYTHONPATH=practice uv run python .local/orm_variation.py</code>. The extra path lets the copy import the supplied orm_example module. Expected page name: ready. If your variation file already exists, preserve it and choose a new filename. Independent variation: delete ready instead of review and predict the remaining ordered names. Record answers in the weekly log. Keep supplied examples unchanged; <code>uv run pytest practice/test_examples.py -q</code> checks both instructor traces. Next, read the transaction boundary below.</p>
+<h2>Understand the supplied boundary</h2>
+<p>At the weekly root read <a href="../projects/task-api/db.py">db.py</a>, then <a href="../projects/task-api/app.py">app.py</a>'s repo/transact functions, then <a href="../projects/task-api/repository.py">repository.py</a>. db.py reads DATABASE_URL and enables a connection health pre-check; it neither migrates nor resets data. repo yields one repository backed by one Session per request. <code>yield</code> hands the dependency to FastAPI, which resumes cleanup afterwards. transact owns begin/commit and converts known domain failures after rollback. Unexpected failures remain failures.</p>
+<p>Implement repository.create as a small task-plus-event unit. It may flush to obtain the task ID, but must not commit. The outer boundary commits both rows. Return a plain dictionary while values are available; returning a lazily loaded ORM object after the session closes can cause detached-object errors or unexpected SQL during serialization. A repository-level commit would make the rollback test fail because the task could outlive its rejected event.</p>
+<p>Use bound parameters or SQLAlchemy expressions for values; never construct SQL with an f-string containing request input. The quote-like string <code>x' OR true --</code> must remain a title value, not a condition. Read the parameter check in test_postgres.py; run <code>uv run pytest practice/test_postgres.py -q -k parameter</code> and record what it proves.</p>
+<details><summary>Hint for page()</summary><p>Build a shared filter condition, count matching tasks, then SELECT the same filtered set ordered by id with offset/limit. A missing done filter differs from false; test <code>done is not None</code>, not <code>if done</code>.</p></details>
+<details><summary>Check the failure</summary><p>If false falls through a truthiness check, the API returns all tasks instead of unfinished tasks. This is a query-construction bug, not a PostgreSQL boolean problem.</p></details>
+<p>Starting at the weekly root, edit repository.py after your models, implementing get/create first and leaving the remaining TODOs visible. Record the transaction owner and expected SQL in the weekly log. Testing persistent operations needs a schema; go to migrations before implementing the entire repository. Variation: explain what would change if a single business operation called two repositories.</p>
+<p class="source">Primary reading: <a href="https://docs.sqlalchemy.org/en/20/orm/session_basics.html">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="0007-models.html">← Previous</a><a href="0009-migrations.html">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

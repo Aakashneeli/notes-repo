@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>10. Follow one request to durable rows — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 10</p><h1>Follow one request to durable rows</h1><p class="lede">Implement the API's persistence without hiding its data flow.</p>
+
+<p>Your main project replaces the Week 4 in-memory service with database-backed behavior. The inspected Week 4 files remain unfinished, so this desk supplies a minimal HTTP bridge in app.py/schemas.py. It preserves the core Task operations, validation and dummy roles, but isn't evidence of completing Week 4's full uniform error and manual QA requirements. If you complete your own Week 4 API later, adapt its handlers here and keep its fuller contract.</p>
+<h2>Trace create before coding more operations</h2>
+<p>A POST body reaches TaskCreate. <code>Annotated</code> attaches string rules; <code>StrictBool</code> rejects strings/numbers used as booleans; <code>extra="forbid"</code> rejects unknown keys. The writer dependency accepts the local write key. repo opens a Session. transact begins the unit of work. Your repository inserts Task, flushes for ID, inserts TaskEvent and returns a dictionary. Transaction exit commits before create returns a 201 response. On a unique-title violation, rollback happens first, then the named expected constraint maps to 409.</p>
+<p>Read <a href="../projects/task-api/schemas.py">schemas.py</a> line by line. PATCH uses model_fields_set to distinguish omitted from explicitly supplied fields. model_dump(exclude_unset=True) passes only changes; a supplied false must survive. The validator rejects explicit None despite the optional internal defaults. Read app.py's create_app: an injected engine is owned by the caller (tests); an internally created engine is disposed at shutdown. Health reports that the HTTP process responds; it is not a database readiness proof.</p>
+<h2>Build a thin vertical slice</h2>
+<p>Start at the weekly root. Implement models.py/migrations and repository.create/get first. Run <code>uv run alembic -c projects/task-api/alembic.ini upgrade head</code>, then:</p>
+<pre><code>uv run uvicorn --app-dir projects/task-api app:create_app --factory --port 8055</code></pre>
+<p><code>--app-dir</code> makes the flat project's modules importable, <code>app:create_app</code> names module:function, and <code>--factory</code> calls the function. Keep this terminal running. Open a second terminal and <code>cd /home/an10/code/notes-repo/backend/week-05</code>. Read supplied <a href="../projects/task-api/data/create.json">create.json</a> (request sample; keep unchanged), then run:</p>
+<pre><code>curl -i -H 'X-API-Key: local-study-key' \
+ -H 'Content-Type: application/json' \
+ --data @projects/task-api/data/create.json http://127.0.0.1:8055/tasks</code></pre>
+<p>Expect 201 and a positive ID with title Read SQL and done false. A repeated identical request should return 409; create is not an idempotent upsert. In psql verify tasks and task_events contain the related rows. Record the returned ID; do not assume 1. Stop the API with Ctrl-C and restart the same command. GET the recorded ID: the same row must exist. If not, check DATABASE_URL, commits and accidental in-memory fallback.</p>
+<h2>Expand with the same boundary</h2>
+<p>Implement page/update/delete, following the project README. Using your returned ID in place of 7:</p>
+<pre><code>curl -i -H 'X-API-Key: local-read-key' http://127.0.0.1:8055/tasks/7
+curl -i -X PATCH -H 'X-API-Key: local-study-key' \
+ -H 'Content-Type: application/json' \
+ --data @projects/task-api/data/update.json http://127.0.0.1:8055/tasks/7
+curl -i -H 'X-API-Key: local-read-key' 'http://127.0.0.1:8055/tasks?done=true&amp;limit=1'
+curl -i -X DELETE -H 'X-API-Key: local-study-key' http://127.0.0.1:8055/tasks/7</code></pre>
+<p><a href="../projects/task-api/data/update.json">update.json</a> supplies done true. Expect GET/PATCH/list 200; DELETE 204 with no body; subsequent GET 404. Quote the query URL so &amp; isn't interpreted by Bash. Complete your own query-to-endpoint notes in the project README, recording filter/count/page SQL and event writes, not just endpoint names.</p>
+<details><summary>Hint for a 500 during create</summary><p>Look at the local traceback: NotImplementedError means an expected starter; undefined table means migrations/destination; an unexpected integrity error means inspect the exact violated rule. Do not turn every IntegrityError into “duplicate title.”</p></details>
+<details><summary>Explain the two-commit bug</summary><p>If create commits Task before adding Event, the later exception cannot undo that earlier committed transaction. Use one outer commit for both writes and let a failure escape to rollback.</p></details>
+<p>Record response codes, database observations and restart evidence in the weekly log. Variation: create a title containing an apostrophe and retrieve it exactly; explain why parameters keep it data. Next, automate failure evidence against a test database.</p>
+<p class="source">Primary reading: <a href="https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="0009-migrations.html">← Previous</a><a href="0011-integration-tests.html">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

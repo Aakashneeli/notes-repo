@@ -1,0 +1,173 @@
+{
+  "info": {
+    "name": "Week 06 local ingestion \u2014 learner collection",
+    "description": "Choose local files in form-data after import. Set local environment key; never sync a real secret. Add an independent edge case after baseline QA.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Upload valid text",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}",
+            "type": "text"
+          }
+        ],
+        "url": "{{base_url}}/documents",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "hello.txt",
+              "contentType": "text/plain"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", function () { pm.response.to.have.status(202); });",
+              "if (pm.response.code === 202) pm.environment.set(\"job_id\", pm.response.json().job_id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth failure missing key",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/documents",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "hello.txt",
+              "contentType": "text/plain"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth failure invalid key",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "incorrect",
+            "type": "text"
+          }
+        ],
+        "url": "{{base_url}}/documents",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "hello.txt",
+              "contentType": "text/plain"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid file type",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}",
+            "type": "text"
+          }
+        ],
+        "url": "{{base_url}}/documents",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "invalid.html",
+              "contentType": "text/html"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 415\", function () { pm.response.to.have.status(415); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Job status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}",
+            "type": "text"
+          }
+        ],
+        "url": "{{base_url}}/jobs/{{job_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

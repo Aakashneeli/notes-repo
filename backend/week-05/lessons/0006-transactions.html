@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>6. Make two writes succeed together — Week 5</title><link rel="stylesheet" href="../assets/course.css"></head>
+<body><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/vocabulary.html">Vocabulary</a></nav>
+<p class="eyebrow">Week 05 / lesson 06</p><h1>Make two writes succeed together</h1><p class="lede">Predict commit, rollback and a competing write.</p>
+
+<p>A transaction groups database work into a unit. Suppose creating a task also records a created event. If the task commits first and event insertion then fails, your history lies about stored data. Put both writes inside one transaction; either both commit or neither does. Commit makes the transaction durable under the database's configured guarantees; flush merely sends pending SQL. Neither replaces backups.</p>
+<h2>Trace the aborted state</h2>
+<p>At the weekly root open <code>psql "$W5_PSQL_URL" -X</code> and run <code>\i practice/seed.sql</code>. Use this temporary sample:</p>
+<pre><code>BEGIN;
+UPDATE articles SET views=11 WHERE id=1;
+INSERT INTO articles VALUES (5,999,'Bad reference',false,0);
+SELECT views FROM articles WHERE id=1;
+ROLLBACK;
+SELECT views FROM articles WHERE id=1;</code></pre>
+<p>UPDATE succeeds inside the transaction. INSERT fails its foreign key. The next SELECT reports an aborted transaction instead of 11. ROLLBACK restores a usable connection and undoes the UPDATE; the last SELECT gives 10. Catching a Python exception alone will not magically repair an aborted database transaction. End it with rollback (or a previously established savepoint, optional later).</p>
+<p>Read <a href="../practice/test_postgres.py">practice/test_postgres.py</a> now: completed instructor checks use temporary tables and SQL assertions. Its connection fixture opens a real local test database, loads seed and commits the setup. Each test closes that connection, removing its temporary tables. The rollback test deliberately fails the second write and checks the first stayed unchanged. From the weekly root run <code>uv run pytest practice/test_postgres.py -q -k rollback</code>. Record result and your state trace in the weekly log.</p>
+<h2>Two terminals, one stored value</h2>
+<p>Temporary tables are connection-local, so use a uniquely named practice table for this concurrency observation. Exit the seed session with <code>\q</code>. In each of two terminals starting at the weekly root, open <code>psql 'postgresql://postgres:local-only@127.0.0.1:55435/w5_test' -X</code>. This deliberately uses w5_test, keeping experimental tables out of the dev schema that Alembic will compare. In terminal A create <code>CREATE TABLE w5_counter_practice (id integer PRIMARY KEY,n integer NOT NULL);</code> then <code>INSERT INTO w5_counter_practice VALUES (1,0);</code>. If it already exists, SELECT it and choose a fresh name for a new attempt; never reset past data. The automated project tests use separate random schemas and do not reset this practice table.</p>
+<pre><code>-- Terminal A, connected to w5_test
+BEGIN;
+UPDATE w5_counter_practice SET n=n+1 WHERE id=1;
+-- Leave transaction open.
+
+-- Terminal B, same w5_test in a second psql connection
+BEGIN;
+SET LOCAL lock_timeout='10s';
+UPDATE w5_counter_practice SET n=n+1 WHERE id=1;</code></pre>
+<p>B waits on A's row lock. Within ten seconds, type COMMIT in A; then B's UPDATE completes. Type COMMIT in B and SELECT n: expected 2 from initial zero. If B times out, ROLLBACK B, commit A, and retry B's transaction; record the timeout rather than hiding it. Leave the practice table as evidence. Exit both connections with \q.</p>
+<p>PostgreSQL's default Read Committed isolation gives statements snapshots; it does not turn a separate read/modify/write sequence into one indivisible action. If both clients read zero then each sends <code>SET n=1</code>, the second may overwrite the first increment. <code>SET n=n+1</code> computes from the row as updated under the lock. Unique constraints similarly decide competing same-title inserts: one can wait then fail after the winner commits. Sequences may consume IDs on failed transactions, so gaps are normal.</p>
+<details><summary>Hint for the explain-back</summary><p>Separate atomicity (all-or-nothing writes), visibility (what another transaction sees), and conflicts (which writer waits or fails). “Transactions prevent all races” is too broad.</p></details>
+<details><summary>Check your reasoning</summary><p>After A rolls back instead of committing, B increments the original zero and the final value is 1. A successful increment is not lost; A's work was intentionally undone.</p></details>
+<p>Independent variation: repeat with a new row ID and A rolling back. Record actual behavior, then explain how the same-title race should appear as a conflict to an API client. For automated feedback, run <code>uv run pytest practice/test_postgres.py -q -k two_connections</code> from the weekly root. Read its completed instructor test: a Barrier starts two workers together; each owns a connection/transaction; timeouts bound waits. A new random schema holds a counter and unique names; a finally block drops only that generated schema. Two increments finish at 2; same-name inserts produce one commit and one conflict. This is mechanism evidence, not a completed Task API concurrency test. Next, map ordinary Python attributes to stored columns.</p>
+<p class="source">Primary reading: <a href="https://www.postgresql.org/docs/current/transaction-iso.html">official documentation for this mechanism</a>. Read after the worked example; the lesson supplies the reasoning you need to begin. Consult <a href="../reference/commands.html">the command reference</a> when returning after a break.</p>
+<p>Ask your tutor a follow-up whenever a prediction, error or line of code remains unclear. Bring your attempted explanation and observed output.</p>
+<div class="page-nav"><a href="0005-joins.html">← Previous</a><a href="0007-models.html">Next →</a></div><footer>Week 5 • Evidence before completion • Shared <a href="../assets/course.css">local stylesheet</a>, leave unchanged during study. Expand answer disclosures before printing if your browser omits closed content.</footer></main></body></html>

@@ -7,6 +7,10 @@ Current locations:
 - `os-python-tooling/week-01/`: existing Week 1 material, relocated with progress preserved.
 - `python/week-02/`: the requested Week 2 Foundation workspace.
 - `python/week-03/`: source Week 3 — Pro Python (Professional Python Structure, Pydantic, Logging, and Practical LLD).
+- `backend/week-04/`: source Week 4 — FastAPI (HTTP, REST, FastAPI, API Design, Postman, and API Tests).
+- `backend/week-05/`: source Week 5 — Data (PostgreSQL, SQL, SQLAlchemy/SQLModel, Alembic, and Data Modeling); extends the backend Task API.
+
+- `backend/week-06/`: source Week 6 — Backend (Backend Architecture, Auth, Security Basics, File Ingestion, Redis, and Jobs).
 
 Each topic may have a short README and HTML index linking its weeks. Each weekly root uses:
 

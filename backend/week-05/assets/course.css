@@ -1,0 +1,3 @@
+/* Reuse the established local course component; no copied theme or remote assets. */
+@import url("../../week-04/assets/course.css");
+@media print { details { break-inside:auto; } }

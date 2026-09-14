@@ -1,0 +1,332 @@
+{
+  "info": {
+    "name": "Week 4 Task API \u2014 supplied starter; extend and export",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Local dummy data only. Lesson 12 explains clean-state execution, learner extensions and final export."
+  },
+  "item": [
+    {
+      "name": "01 Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{write_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/tasks",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\": \"Postman task\", \"done\": false}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 201\", () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) { pm.environment.set(\"task_id\", pm.response.json().id); }",
+              "pm.test(\"Created title\", () => pm.expect(pm.response.json().title).to.eql(\"Postman task\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{read_key}}"
+          }
+        ],
+        "url": "{{base_url}}/tasks?offset=0&limit=20"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"List contains task\", () => pm.expect(pm.response.json().items.map(x => x.id)).to.include(Number(pm.environment.get(\"task_id\"))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Get",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{read_key}}"
+          }
+        ],
+        "url": "{{base_url}}/tasks/{{task_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Matching ID\", () => pm.expect(pm.response.json().id).to.eql(Number(pm.environment.get(\"task_id\"))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Update",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{write_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/tasks/{{task_id}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"done\": true}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Done retained as boolean\", () => pm.expect(pm.response.json().done).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Invalid payload",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{write_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/tasks",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\": \" \", \"done\": \"yes\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 422\", () => pm.response.to.have.status(422));",
+              "pm.test(\"Error code\", () => pm.expect(pm.response.json().error.code).to.eql(\"validation_error\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Missing auth",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/tasks"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error code\", () => pm.expect(pm.response.json().error.code).to.eql(\"unauthorized\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Wrong auth",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "wrong"
+          }
+        ],
+        "url": "{{base_url}}/tasks"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error code\", () => pm.expect(pm.response.json().error.code).to.eql(\"unauthorized\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Read-only write",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{read_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/tasks/{{task_id}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"done\": false}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 403\", () => pm.response.to.have.status(403));",
+              "pm.test(\"Error code\", () => pm.expect(pm.response.json().error.code).to.eql(\"forbidden\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Missing resource",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{read_key}}"
+          }
+        ],
+        "url": "{{base_url}}/tasks/999999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Error code\", () => pm.expect(pm.response.json().error.code).to.eql(\"not_found\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{write_key}}"
+          }
+        ],
+        "url": "{{base_url}}/tasks/{{task_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 204\", () => pm.response.to.have.status(204));",
+              "pm.test(\"No content\", () => pm.expect(pm.response.text()).to.eql(\"\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Get deleted",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{read_key}}"
+          }
+        ],
+        "url": "{{base_url}}/tasks/{{task_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected status 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Error code\", () => pm.expect(pm.response.json().error.code).to.eql(\"not_found\"));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
