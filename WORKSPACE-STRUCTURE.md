@@ -12,6 +12,8 @@ Current locations:
 
 - `backend/week-06/`: source Week 6 — Backend (Backend Architecture, Auth, Security Basics, File Ingestion, Redis, and Jobs).
 
+- `cloud-devops/week-07/`: source Week 7 — Docker (Docker, Compose, Local Production Shape, Logging, Health Checks, and CI Intro).
+
 Each topic may have a short README and HTML index linking its weeks. Each weekly root uses:
 
 ```text

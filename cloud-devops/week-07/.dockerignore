@@ -1,0 +1,9 @@
+# Supplied build-context allowlist. Read in L4; extend only for required runtime inputs.
+**
+!requirements.lock
+!projects/
+!projects/local-stack/
+!projects/local-stack/*.py
+!projects/local-stack/fixture/
+!projects/local-stack/fixture/*.py
+!projects/local-stack/Dockerfile

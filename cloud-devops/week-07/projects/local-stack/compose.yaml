@@ -1,0 +1,5 @@
+# Learner L5-L6: starts incomplete on purpose. No cloud resources.
+name: week7-ingestion
+services: {}
+# Add api, postgres, redis, worker, vector; data volumes; app/data networks.
+# Build context: ../.. ; Dockerfile: projects/local-stack/Dockerfile

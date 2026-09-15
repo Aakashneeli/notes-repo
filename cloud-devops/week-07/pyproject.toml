@@ -1,0 +1,8 @@
+[tool.pytest.ini_options]
+pythonpath = ["projects/local-stack", "practice"]
+testpaths = ["projects/local-stack/tests", "practice"]
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

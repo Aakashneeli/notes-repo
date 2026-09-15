@@ -1,0 +1,9 @@
+# Learner L11: staged here, inactive until YOU install it at repository root
+# .github/workflows/week-07.yml. Do not publish or enable merely to study.
+name: Week 7 checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs: {}
+# TODO Ubuntu runner, checkout, setup-python 3.12, working-directory,
+# pip install -r requirements.lock, python -m ruff check ., python -m pytest -q.

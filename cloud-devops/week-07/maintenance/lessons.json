@@ -1,0 +1,93 @@
+[
+  {
+    "number": 1,
+    "file": "lessons/0001-start.html",
+    "title": "Find your starting point",
+    "outcome": "Choose the smallest prerequisite bridge that lets you explain a reproducible service.",
+    "source": "https://fastapi.tiangolo.com/deployment/docker/"
+  },
+  {
+    "number": 2,
+    "file": "lessons/0002-fixture.html",
+    "title": "Run the prerequisite fixture checks",
+    "outcome": "Trace the supplied ingestion bridge without treating it as your completed earlier project.",
+    "source": "https://www.psycopg.org/psycopg3/docs/basic/usage.html"
+  },
+  {
+    "number": 3,
+    "file": "lessons/0003-image.html",
+    "title": "Build once, run twice",
+    "outcome": "Predict which values belong to an image and which belong to one running container.",
+    "source": "https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/"
+  },
+  {
+    "number": 4,
+    "file": "lessons/0004-dockerfile.html",
+    "title": "Package the ingestion application",
+    "outcome": "Write the build recipe and explain every path from host context to runtime import.",
+    "source": "https://docs.docker.com/build/concepts/dockerfile/"
+  },
+  {
+    "number": 5,
+    "file": "lessons/0005-network.html",
+    "title": "Let services find each other",
+    "outcome": "Choose an address from the caller\u2019s location and wire the five service boundaries.",
+    "source": "https://docs.docker.com/compose/how-tos/networking/"
+  },
+  {
+    "number": 6,
+    "file": "lessons/0006-lifecycle.html",
+    "title": "Keep data through container replacement",
+    "outcome": "Separate service startup, dependency readiness and persistent state.",
+    "source": "https://docs.docker.com/compose/how-tos/startup-order/"
+  },
+  {
+    "number": 7,
+    "file": "lessons/0007-health.html",
+    "title": "Make health claims precise",
+    "outcome": "Implement two endpoints whose status codes match the claims they make.",
+    "source": "https://fastapi.tiangolo.com/advanced/additional-status-codes/"
+  },
+  {
+    "number": 8,
+    "file": "lessons/0008-events.html",
+    "title": "Write logs a tool can read",
+    "outcome": "Create a safe JSON event and explain how it travels to a log reader.",
+    "source": "https://docs.python.org/3/library/logging.html"
+  },
+  {
+    "number": 9,
+    "file": "lessons/0009-middleware.html",
+    "title": "Follow one request through middleware",
+    "outcome": "Correlate successful and failed HTTP responses without leaking request content.",
+    "source": "https://fastapi.tiangolo.com/tutorial/middleware/"
+  },
+  {
+    "number": 10,
+    "file": "lessons/0010-debug.html",
+    "title": "Diagnose the running stack",
+    "outcome": "Find the failing layer with a probe, then prove the repair with a real job.",
+    "source": "https://docs.docker.com/reference/cli/docker/compose/up/"
+  },
+  {
+    "number": 11,
+    "file": "lessons/0011-ci.html",
+    "title": "Make checks repeat on a clean runner",
+    "outcome": "Write a push/PR workflow and explain each process and working directory.",
+    "source": "https://docs.github.com/en/actions/tutorials/build-and-test-code/python"
+  },
+  {
+    "number": 12,
+    "file": "lessons/0012-fresh-clone.html",
+    "title": "Make the start path reproducible",
+    "outcome": "Prove a documented start command without relying on hidden local files.",
+    "source": "https://docs.docker.com/build/concepts/context/"
+  },
+  {
+    "number": 13,
+    "file": "lessons/0013-review.html",
+    "title": "Prove ownership and retain it",
+    "outcome": "Explain, debug and vary the stack independently, then schedule delayed retrieval.",
+    "source": "https://docs.pytest.org/en/stable/how-to/monkeypatch.html"
+  }
+]

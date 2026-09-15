@@ -1,0 +1,8 @@
+# Completed networking example; not the assessed five-service stack.
+name: week7-network-demo
+services:
+  cache:
+    image: redis:7-alpine
+  client:
+    image: redis:7-alpine
+    command: ["redis-cli", "-h", "cache", "ping"]

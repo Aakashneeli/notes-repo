@@ -1,0 +1,13 @@
+flowchart LR
+  host[Host client]
+  subgraph app_net[app network]
+    api[API]
+  end
+  subgraph data_net[data network - internal]
+    postgres[Postgres]
+    redis[Redis]
+    worker[RQ worker]
+    vector[Qdrant placeholder]
+  end
+  %% Learner L5/L12: add API membership in data, labelled arrows and named volumes.
+  %% Distinguish host publish port from service ports; no browser-to-worker arrow.

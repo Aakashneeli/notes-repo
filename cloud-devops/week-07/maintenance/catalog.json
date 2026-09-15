@@ -1,0 +1,382 @@
+[
+  {
+    "path": ".dockerignore",
+    "lesson": "lessons/0004-dockerfile.html",
+    "action": "Read supplied composition/build support; leave unchanged initially."
+  },
+  {
+    "path": ".gitignore",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read supplied dependency/configuration metadata; use the lock to install, do not edit initially."
+  },
+  {
+    "path": "AI-USAGE.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "MISSION.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "NOTES.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "README.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "RESOURCES.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "VALIDATION.md",
+    "lesson": "lessons/0013-review.html",
+    "action": "Read tutor-maintained verification claims and limits; do not treat as learner evidence."
+  },
+  {
+    "path": "assets/course.css",
+    "lesson": "lessons/0001-start.html",
+    "action": "Shared presentation asset; leave unchanged."
+  },
+  {
+    "path": "codebase-reading/reading-log.md",
+    "lesson": "lessons/0013-review.html",
+    "action": "Learner: fill the focused code/document reading note after your implementation."
+  },
+  {
+    "path": "index.html",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "lessons/0001-start.html",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0002-fixture.html",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0003-image.html",
+    "lesson": "lessons/0003-image.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0004-dockerfile.html",
+    "lesson": "lessons/0004-dockerfile.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0005-network.html",
+    "lesson": "lessons/0005-network.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0006-lifecycle.html",
+    "lesson": "lessons/0006-lifecycle.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0007-health.html",
+    "lesson": "lessons/0007-health.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0008-events.html",
+    "lesson": "lessons/0008-events.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0009-middleware.html",
+    "lesson": "lessons/0009-middleware.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0010-debug.html",
+    "lesson": "lessons/0010-debug.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0011-ci.html",
+    "lesson": "lessons/0011-ci.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0012-fresh-clone.html",
+    "lesson": "lessons/0012-fresh-clone.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "lessons/0013-review.html",
+    "lesson": "lessons/0013-review.html",
+    "action": "Read this lesson, predict before checking, do its practice and append evidence."
+  },
+  {
+    "path": "maintenance/catalog.json",
+    "lesson": "lessons/0013-review.html",
+    "action": "Tutor-maintained verification support: read when diagnosing material/navigation; run checks without editing learner files."
+  },
+  {
+    "path": "maintenance/check_project.py",
+    "lesson": "lessons/0011-ci.html",
+    "action": "Run the supplied structural gate; expected red on starters; leave checker unchanged."
+  },
+  {
+    "path": "maintenance/lessons.json",
+    "lesson": "lessons/0013-review.html",
+    "action": "Tutor-maintained verification support: read when diagnosing material/navigation; run checks without editing learner files."
+  },
+  {
+    "path": "maintenance/test_checks.py",
+    "lesson": "lessons/0013-review.html",
+    "action": "Tutor-maintained verification support: read when diagnosing material/navigation; run checks without editing learner files."
+  },
+  {
+    "path": "maintenance/test_fixture.py",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Run supplied offline fixture checks; understand injected backend and limitations."
+  },
+  {
+    "path": "maintenance/verify.py",
+    "lesson": "lessons/0013-review.html",
+    "action": "Tutor-maintained verification support: read when diagnosing material/navigation; run checks without editing learner files."
+  },
+  {
+    "path": "plan/README.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "plan/assessment.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "plan/coverage.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "plan/file-map.html",
+    "lesson": "lessons/0001-start.html",
+    "action": "Read for orientation; leave tutor-maintained context unchanged."
+  },
+  {
+    "path": "plan/progress.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Learner: append attempts and dates; mark ability only with evidence."
+  },
+  {
+    "path": "practice/exercises.py",
+    "lesson": "lessons/0005-network.html",
+    "action": "Learner: implement service_address now and safe_fields in Lesson 8; run focused tests."
+  },
+  {
+    "path": "practice/mechanisms.py",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read and run completed mechanisms; compare predicted outputs without copying a main project."
+  },
+  {
+    "path": "practice/test_exercises.py",
+    "lesson": "lessons/0005-network.html",
+    "action": "Read supplied assertions, run the lesson-selected subset; leave checks unchanged."
+  },
+  {
+    "path": "practice/test_mechanisms.py",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read and run completed mechanisms; compare predicted outputs without copying a main project."
+  },
+  {
+    "path": "practice/tiny-image/.dockerignore",
+    "lesson": "lessons/0003-image.html",
+    "action": "Read completed example, run it, then vary only this disposable teaching example."
+  },
+  {
+    "path": "practice/tiny-image/Dockerfile",
+    "lesson": "lessons/0003-image.html",
+    "action": "Read completed example, run it, then vary only this disposable teaching example."
+  },
+  {
+    "path": "practice/tiny-image/hello.py",
+    "lesson": "lessons/0003-image.html",
+    "action": "Read completed example, run it, then vary only this disposable teaching example."
+  },
+  {
+    "path": "practice/two-services.yaml",
+    "lesson": "lessons/0005-network.html",
+    "action": "Read and run the completed two-service DNS example; stop it after the observation."
+  },
+  {
+    "path": "projects/local-stack/.env.example",
+    "lesson": "lessons/0005-network.html",
+    "action": "Read required connections and disposable defaults; pass env example explicitly to Compose."
+  },
+  {
+    "path": "projects/local-stack/Dockerfile",
+    "lesson": "lessons/0004-dockerfile.html",
+    "action": "Learner: implement the build recipe and verify import paths."
+  },
+  {
+    "path": "projects/local-stack/README.md",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read the contract and fill only learner bridge-choice fields with actual evidence."
+  },
+  {
+    "path": "projects/local-stack/app.py",
+    "lesson": "lessons/0004-dockerfile.html",
+    "action": "Read supplied composition/build support; leave unchanged initially."
+  },
+  {
+    "path": "projects/local-stack/architecture.mmd",
+    "lesson": "lessons/0005-network.html",
+    "action": "Learner: fill topology arrows and reasons progressively; finish in Lesson 12."
+  },
+  {
+    "path": "projects/local-stack/bridge-notes.md",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read the contract and fill only learner bridge-choice fields with actual evidence."
+  },
+  {
+    "path": "projects/local-stack/ci/workflow.yml",
+    "lesson": "lessons/0011-ci.html",
+    "action": "Learner: complete draft, validate locally; keep inactive until deliberately installed later."
+  },
+  {
+    "path": "projects/local-stack/ci-evidence.md",
+    "lesson": "lessons/0011-ci.html",
+    "action": "Learner: record actual local failure/pass and distinguish any later hosted run."
+  },
+  {
+    "path": "projects/local-stack/compose.yaml",
+    "lesson": "lessons/0005-network.html",
+    "action": "Learner: implement and refine topology/configuration with the contract."
+  },
+  {
+    "path": "projects/local-stack/data/hello.txt",
+    "lesson": "lessons/0010-debug.html",
+    "action": "Read supplied public sample; send as bytes in live lab and retain it for repeatable checks."
+  },
+  {
+    "path": "projects/local-stack/debugging-note.md",
+    "lesson": "lessons/0010-debug.html",
+    "action": "Learner: fill from an actual failure and repair; preserve earlier entries."
+  },
+  {
+    "path": "projects/local-stack/decisions.md",
+    "lesson": "lessons/0005-network.html",
+    "action": "Learner: fill topology arrows and reasons progressively; finish in Lesson 12."
+  },
+  {
+    "path": "projects/local-stack/fixture/__init__.py",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read supplied prerequisite code and trace data flow; leave unchanged initially."
+  },
+  {
+    "path": "projects/local-stack/fixture/api.py",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read supplied prerequisite code and trace data flow; leave unchanged initially."
+  },
+  {
+    "path": "projects/local-stack/fixture/bootstrap.py",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read supplied prerequisite code and trace data flow; leave unchanged initially."
+  },
+  {
+    "path": "projects/local-stack/fixture/core.py",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read supplied prerequisite code and trace data flow; leave unchanged initially."
+  },
+  {
+    "path": "projects/local-stack/fixture/probes.py",
+    "lesson": "lessons/0007-health.html",
+    "action": "Read supplied network probe adapters and their timeout/failure limits; leave unchanged."
+  },
+  {
+    "path": "projects/local-stack/observability.py",
+    "lesson": "lessons/0008-events.html",
+    "action": "Learner: configure safe event emission, then implement request correlation in Lesson 9."
+  },
+  {
+    "path": "projects/local-stack/operations.py",
+    "lesson": "lessons/0007-health.html",
+    "action": "Learner: implement policy and endpoints, then run the focused contract tests."
+  },
+  {
+    "path": "projects/local-stack/runbook.md",
+    "lesson": "lessons/0012-fresh-clone.html",
+    "action": "Learner: complete runbook and record actual committed fresh-copy trial results."
+  },
+  {
+    "path": "projects/local-stack/service-contract.md",
+    "lesson": "lessons/0005-network.html",
+    "action": "Read required connections and disposable defaults; pass env example explicitly to Compose."
+  },
+  {
+    "path": "projects/local-stack/smoke.py",
+    "lesson": "lessons/0010-debug.html",
+    "action": "Read then run against the completed real local stack; record output, not assumed success."
+  },
+  {
+    "path": "projects/local-stack/tests/test_contract.py",
+    "lesson": "lessons/0007-health.html",
+    "action": "Read fixed contract assertions; run selected cases, then all; do not weaken them."
+  },
+  {
+    "path": "projects/local-stack/tests/test_learner.py",
+    "lesson": "lessons/0009-middleware.html",
+    "action": "Learner: add independent variations/regressions; run them with the full test suite."
+  },
+  {
+    "path": "pyproject.toml",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read supplied dependency/configuration metadata; use the lock to install, do not edit initially."
+  },
+  {
+    "path": "reference/glossary.html",
+    "lesson": "lessons/0013-review.html",
+    "action": "Read after closed-book retrieval; use as compressed reference, not progress evidence."
+  },
+  {
+    "path": "reference/operations.html",
+    "lesson": "lessons/0013-review.html",
+    "action": "Read after closed-book retrieval; use as compressed reference, not progress evidence."
+  },
+  {
+    "path": "requirements.in",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read supplied dependency/configuration metadata; use the lock to install, do not edit initially."
+  },
+  {
+    "path": "requirements.lock",
+    "lesson": "lessons/0002-fixture.html",
+    "action": "Read supplied dependency/configuration metadata; use the lock to install, do not edit initially."
+  },
+  {
+    "path": "templates/mistake.md",
+    "lesson": "lessons/0010-debug.html",
+    "action": "Read/copy this template into your project debugging note only when a failure occurs."
+  },
+  {
+    "path": "templates/review.md",
+    "lesson": "lessons/0013-review.html",
+    "action": "Copy into the weekly log only for a real session/retrieval attempt."
+  },
+  {
+    "path": "templates/session.md",
+    "lesson": "lessons/0013-review.html",
+    "action": "Copy into the weekly log only for a real session/retrieval attempt."
+  },
+  {
+    "path": "weekly-logs/week-07.md",
+    "lesson": "lessons/0001-start.html",
+    "action": "Learner: append attempts and dates; mark ability only with evidence."
+  }
+]
