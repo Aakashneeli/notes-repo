@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>13 · Explain the pipeline without copying</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 13</p><h1>Explain the pipeline without copying</h1><p class="lede">Collect independent evidence, review code boundaries and schedule retrieval.</p>
+
+<p>Now assess ownership: can you rebuild a small piece, explain a failure and vary it with fewer hints? Reading all pages or passing author checks does not answer that.</p>
+<h2>Read one boundary closely</h2>
+<p>Open learner-owned <a href="../codebase-reading/reading-log.md">codebase-reading/reading-log.md</a>. Start with client_demo in practice/examples.py, then follow the official Qdrant client's query_points API and local-mode documentation. Record the version/URL, input shape, output shape, resource lifetime and what changes when using a remote server. Read only the path needed to answer one question; no repository clone is necessary.</p>
+<p>In a second short note, trace your own create_app → search → answer boundary. Identify where a dictionary becomes JSON and where an injected provider is called. Explain why a mock proves call/validation behavior but not factual grounding. Cross-link one test to one claim.</p>
+<h2>Four source explain-backs</h2>
+<p>Use <a href="../templates/review.md">templates/review.md</a> to append a closed-notes attempt to weekly-logs/week-08.md. Answer all four roadmap prompts: what is stored for each document, chunk and embedding; how context is selected; how retrieval and generation failures are distinguished; what private data could leak through prompts or logs. Use a concrete ID and one failing example per answer.</p>
+<p>Update data-flow.md with an actual query trace and provider/privacy boundaries. Finish comparison and evaluation reports. Use <a href="../reference/glossary.html">the glossary</a> and <a href="../reference/debugging.html">debugging reference</a> to check vocabulary after your first attempt, then mark what you needed to look up.</p>
+<h2>Git as evidence</h2>
+<pre><code># Start: weekly root
+git status --short
+git diff -- projects/manual-rag/rag.py
+git diff --check</code></pre>
+<p>Untracked files do not appear in an ordinary diff, so inspect status and open new files too. Do not stage existing unrelated learner work. After reviewing your own implementation, use explicit paths:</p>
+<pre><code>git add projects/manual-rag/rag.py projects/manual-rag/decisions.md
+git diff --cached --stat
+git diff --cached --check</code></pre>
+<p>Check that only intended content is staged before making your own commit. Do not commit secrets, runtime databases or model weights. Creating these materials did not commit anything. Record a commit ID only after you create one; a staged change is not a historical checkpoint.</p>
+<h2>Verification is not learning</h2>
+<p>Read <a href="../VALIDATION.md">VALIDATION.md</a> for author checks and limits. <a href="../maintenance/verify.py">maintenance/verify.py</a> checks navigation, map coverage and syntax; <a href="../maintenance/test_examples.py">maintenance/test_examples.py</a> checks completed fragments and deliberately broken variants. Leave these tutor-maintained files unchanged unless improving the course. Run from the weekly root:</p>
+<pre><code>.venv/bin/python maintenance/verify.py
+.venv/bin/python -m pytest maintenance -q</code></pre>
+<p>These should pass even while your project is unfinished. Run the separate project/practice suites for your implementation. A course-author pass cannot tick a learner completion box. Read <a href="../plan/teaching-review.md">the teaching review</a> for the distinction between coverage, working code and a teachable progression.</p>
+<h2>Delayed retrieval</h2>
+<p>After roughly two days, reconstruct one query trace without the diagram. After roughly a week, implement a small changed requirement—such as a different chunk size or an unknown-question policy—and predict affected tests before running them. Dates are flexible; the gap matters more than a streak.</p>
+<details><summary>Guided check · all tests pass, but you cannot explain tenant filtering</summary><p>Leave that skill unchecked. Trace the two-tenant test, close it, then explain why filtering must happen before top-k and before the provider call. Passing copied code is insufficient evidence.</p></details>
+<p>Independent variation: your correct source is retrieved but a lower context budget excludes it. Diagnose it without blaming the embedding model. Record your explanation and next smallest task. The tutor may add a short numbered learning record after demonstrated insight or a newly disclosed baseline; no empty learning-records folder is needed.</p>
+
+<p class="source">Primary reading: <a href="https://github.com/qdrant/qdrant-client">qdrant official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0012-comparison.html">← Previous</a><a href="../plan/assessment.md">Next →</a></nav></main></body></html>

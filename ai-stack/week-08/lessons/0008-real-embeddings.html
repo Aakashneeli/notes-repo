@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>08 · Replace known vectors with text embeddings</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 08</p><h1>Replace known vectors with text embeddings</h1><p class="lede">Run or explicitly defer a real encoder and describe what its result proves.</p>
+
+<p>Known vectors isolate mechanics. To test semantic retrieval, encode both documents and queries using the same real model. This step adds a model download and CPU inference, so keep its evidence separate from the no-download checks.</p>
+<h2>Read the supplied probe</h2>
+<p>The <a href="https://qdrant.github.io/fastembed/Getting%20Started/">official FastEmbed guide</a> documents the encoder generator and first-use download behavior used here.</p>
+<p><a href="../practice/semantic_probe.py">practice/semantic_probe.py</a> uses FastEmbed to load the named MiniLM encoder, embeds two tiny sentences, derives the dimension from the returned query, writes to an in-memory Qdrant collection, and prints both ranked hits. Leave the probe unchanged for its first run. <code>embed</code> yields arrays; <code>tolist()</code> converts each into the ordinary float list the store expects. No hosted generation occurs.</p>
+<p>Prerequisites: internet access for the first weight download, enough local disk/RAM for the package and model, and a compatible CPU/runtime. Review the model license/card first. A GPU is not required for this small probe; latency depends on hardware. The optional package is separate from the core lock so offline practice does not silently download a model.</p>
+<pre><code># Start: ai-stack/week-08; learner action, downloads dependencies and weights
+UV_CACHE_DIR=/tmp/week08-uv-cache uv pip install --python .venv/bin/python 'fastembed&gt;=0.7,&lt;1'
+.venv/bin/python -m practice.semantic_probe</code></pre>
+<p>Expected observation: dimension 384, two scored text rows, usually the book-return sentence first. Do not expect exact scores across runtime/model changes. If bicycles rank first, record that failure rather than rewriting the expectation. <code>.cache/models</code> is generated model data; do not commit it. Record exact installed FastEmbed version, model identifier/revision if resolved, hardware, run time and ranking in decisions.md.</p>
+<h2>Understand the adapter seam</h2>
+<p>The project accepts <code>embed(text)</code>, a callable returning a vector. A callable is simply something you can call with parentheses, such as a function or object with a call method. Load a real model once, then wrap it with a function that embeds one string. Recreating the encoder per request wastes startup work. Set Store's dimension from the encoder output and ensure query/document settings match.</p>
+<pre><code># Shape sketch for learner integration, not a completed service
+encoder = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
+def embed_one(text):
+    return next(encoder.embed([text])).tolist()</code></pre>
+<p><code>next</code> takes the first yielded item; a one-element input list yields one vector. For batches, preserve input order so each vector stays attached to its own chunk. This sketch still needs your lifecycle, version configuration and failure handling.</p>
+<h2>A guided failure</h2>
+<p>The old collection contains 3-dimensional synthetic vectors. Can you point the 384-dimensional encoder at it?</p>
+<details><summary>Hint</summary><p>Check the collection's invariant before the first write.</p></details>
+<details><summary>Explained answer</summary><p>No. Create a separately named/path-isolated collection for the real model, re-embed all intended source text, and use that model for queries. Do not delete the earlier database to make this experiment work, and do not mix old and new scores in one evaluation report.</p></details>
+<p>Independent variation: change the query to “Can I send my purchase back?” and compare semantic ranking with the simple keyword fixture. Write one reason it may still miss. A successful two-sentence probe proves that an encoder and local store can exchange vectors; it does not prove quality on the 20-question corpus. If download or hardware blocks this step, retain the exact error and mark real-semantic evidence pending; continue the deterministic project work.</p>
+
+<p class="source">Primary reading: <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">model official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0007-vector-store.html">← Previous</a><a href="0009-context.html">Next →</a></nav></main></body></html>

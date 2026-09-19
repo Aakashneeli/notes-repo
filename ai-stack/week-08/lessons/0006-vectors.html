@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>06 · Read a vector as a representation</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 06</p><h1>Read a vector as a representation</h1><p class="lede">Predict simple similarity scores and reject incompatible embeddings.</p>
+
+<p>An embedding model maps text into a list of numbers. Dimensions are the count of numbers, not a count of words. For a learned model, individual coordinates usually do not have human-readable names. Similar geometry may reflect semantic relationships, but a score does not prove an answer is correct.</p>
+<h2>A deliberately tiny geometry</h2>
+<p>For intuition only, draw [1,0] pointing right and [0,1] pointing up. Cosine similarity measures alignment by dividing their dot product by their lengths. A dot product multiplies corresponding coordinates and adds. For [1,0] and [1,1], the numerator is 1 and the lengths are 1 and √2, giving about 0.707. Perpendicular vectors have score 0; identical nonzero direction gives 1 even when length differs.</p>
+<pre><code># Start: ai-stack/week-08
+.venv/bin/python -m practice.examples vectors</code></pre>
+<p>Read <code>cosine</code> in examples.py. <code>zip</code> pairs coordinates, <code>sum</code> adds products, and <code>math.sqrt</code> gives square root. The dimension check happens before zip, which would otherwise silently stop at the shorter input. A zero vector has zero length and cannot be normalized. These are practical data checks, not interview exercises.</p>
+<h2>Model compatibility is more than vector length</h2>
+<p>Two models can emit the same number of values while using different coordinate systems. Comparing their outputs is still invalid for this pipeline. Keep model name, revision, dimension, normalization and chunk-policy version with the collection configuration. Changing the model requires re-embedding stored text and queries together. Do not pad a 384-dimensional vector to fit a different collection.</p>
+<p>Guided exercise: predict cosine([2,0],[1,0]) and cosine([1,0],[-1,0]) before evaluating them:</p>
+<pre><code>.venv/bin/python -c "from practice.examples import cosine; print(cosine([2,0],[1,0])); print(cosine([1,0],[-1,0]))"</code></pre>
+<details><summary>Hint</summary><p>Scaling length does not change direction; reversing direction does.</p></details>
+<details><summary>Explained answer</summary><p>The results are 1.0 and −1.0. Neither score is a calibrated probability. A 0.9 nearest neighbour can still be irrelevant when the corpus lacks an answer.</p></details>
+<p>Independent variation: predict the error for one zero vector and for unequal dimensions, then run each in a separate command. Log the failure and explain why rejecting bad input is more useful than assigning it a misleading score.</p>
+<h2>Choose a model for the task</h2>
+<p>Read the <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">MiniLM model card</a> as an example: it documents a 384-dimensional encoder and input truncation. It is a compact starting point for English fictional policy documents, not proof it fits every language or domain. In decisions.md, compare corpus language, license, size/download, CPU latency and truncation behavior against your task. The <a href="https://huggingface.co/docs/hub/model-cards">model-card documentation</a> explains where intended use and limitations belong. Real measured retrieval will decide whether the choice works.</p>
+<p>Next, store simple known vectors first so database mistakes cannot hide behind model quality.</p>
+
+<p class="source">Primary reading: <a href="https://www.sbert.net/docs/sentence_transformer/usage/semantic_textual_similarity.html">similarity official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0005-chunking.html">← Previous</a><a href="0007-vector-store.html">Next →</a></nav></main></body></html>

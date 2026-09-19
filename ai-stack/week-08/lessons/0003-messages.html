@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>03 · Understand one raw model request</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 03</p><h1>Understand one raw model request</h1><p class="lede">Trace messages, response envelopes and streamed fragments.</p>
+
+<p>A model API is an HTTP boundary: your application sends a model choice and messages; it receives generated content or a transport/provider error. The system role expresses application instructions, the user role carries the question, and assistant messages represent previous replies. Roles organize input; they are not an authorization system.</p>
+<h2>Read the envelope</h2>
+<p>Run the completed message example from the weekly root:</p>
+<pre><code>.venv/bin/python -m practice.examples messages
+.venv/bin/python -m practice.provider_probe</code></pre>
+<p>Read <a href="../practice/provider_probe.py">practice/provider_probe.py</a>. By default it prints a request and sends nothing. <code>request_body</code> builds a dictionary; HTTPX's <code>json=</code> serializes it. A non-streaming chat response wraps generated text under <code>choices[0].message.content</code>. The project adapter must return that content string, not the entire envelope.</p>
+<pre><code>{"choices":[{"message":{"role":"assistant","content":"Hello."}}]}</code></pre>
+<p>Trace: select key <code>choices</code> → first list item at index 0 → its <code>message</code> dictionary → <code>content</code> string. An empty choices list would fail at index 0; a refusal or missing content requires deliberate handling rather than pretending it is a normal answer.</p>
+<h2>Provider compatibility has limits</h2>
+<p><a href="https://console.groq.com/docs/openai">Groq's compatibility documentation</a> supplies its base URL; <a href="https://openrouter.ai/docs/api/reference/overview">OpenRouter's API overview</a> describes another compatible boundary. Matching request shapes does not mean all models support the same structured-output or streaming features. Choose a current model from the provider's official model list and check its feature support.</p>
+<p>A live probe is a learner action: it needs an account, a key, network access and a pricing/budget check. It can incur cost. Send only the supplied harmless greeting. From the weekly root, after choosing an available model:</p>
+<pre><code>export LLM_PROVIDER=groq
+export LLM_MODEL='replace-with-current-provider-model-id'
+read -rsp 'Provider key: ' LLM_API_KEY
+export LLM_API_KEY
+.venv/bin/python -m practice.provider_probe --live
+unset LLM_API_KEY</code></pre>
+<p>The placeholder must be replaced. Do not paste a secret directly into shell history or commit it. The probe has a 20-second timeout and suppresses raw error bodies. A 401 calls for checking credentials, a 400 for checking model/request compatibility, a 429 for respecting limits. Blindly retrying everything can multiply charges. Record provider, model, status and latency in the weekly log, without the key. No live call was needed to prepare this workspace.</p>
+<h2>Streaming awareness, one small drill</h2>
+<p>Streaming delivers fragments over time; the first event may carry a role and no text. Server-sent events also have framing that must be decoded before you have dictionaries. <a href="https://openrouter.ai/docs/api/reference/streaming">The streaming reference</a> supports that distinction. We practise only assembling already-decoded content; this is not a network-stream parser.</p>
+<p>Edit <a href="../practice/exercises.py">practice/exercises.py</a>, function <code>text_from_deltas</code>. Read <a href="../practice/test_exercises.py">test_exercises.py</a>, leave its checks unchanged, then run:</p>
+<pre><code>.venv/bin/python -m pytest practice/test_exercises.py -k deltas -q</code></pre>
+<p>Expected after implementation: one pass. Before implementation: one <code>NotImplementedError</code>. “Thirty ” and “days.” must become “Thirty days.” without a missing space.</p>
+<details><summary>Hint</summary><p>Collect content only when choices is nonempty and content is not null. Join exactly, without inserting spaces.</p></details>
+<details><summary>Explained beginner answer</summary><pre><code>parts = []
+for event in events:
+    choices = event.get("choices", [])
+    if choices:
+        text = choices[0].get("delta", {}).get("content")
+        if text is not None:
+            parts.append(text)
+return "".join(parts)</code></pre><p><code>get</code> supplies a default for absent keys; it does not magically validate arbitrary input. The drill's contract assumes decoded provider-shaped events.</p></details>
+<p>Independent variation: add an empty-string fragment and two sentences split mid-word. Predict the exact result. Streaming a prefix of JSON does not produce a valid final object; validation belongs after complete assembly.</p>
+
+<p class="source">Primary reading: <a href="https://console.groq.com/docs/text-chat">chat official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0002-ingestion-bridge.html">← Previous</a><a href="0004-structured-output.html">Next →</a></nav></main></body></html>

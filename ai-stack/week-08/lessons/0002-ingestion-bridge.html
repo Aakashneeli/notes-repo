@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>02 · Follow one document into the system</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 02</p><h1>Follow one document into the system</h1><p class="lede">Identify the extraction-to-chunking seam without replacing unfinished earlier work.</p>
+
+<p>Retrieval augmented generation (RAG) gives a model selected external text while answering. It has two different lifecycles: ingestion prepares searchable evidence; a query selects evidence for one question. Uploading a file is not the same as making it searchable.</p>
+<h2>A concrete trace</h2>
+<p>Imagine an uploaded returns policy. Earlier ingestion should validate the upload, extract plain text and assign an owner and document identity. Week 8 begins with that extracted text. It creates chunks, turns each chunk into a vector, and stores vectors beside provenance. Later, “When can I return a book?” becomes a query vector; retrieval chooses chunks; the model sees the chosen text and returns an answer with IDs. The application checks those IDs before returning them.</p>
+<p>A document record identifies the whole source. A chunk record identifies an exact excerpt. An embedding is a numerical representation of the excerpt produced by a particular model. Storing only vectors loses the evidence needed for prompts and citations. Storing only text loses the vector search mechanism.</p>
+<h2>Inspect the prerequisite fixture</h2>
+<p>The actual Week 6 service still raises <code>NotImplementedError</code>; Week 7 has an extracted-text fixture but unfinished operational work. We will not mark it complete. Read <a href="../projects/manual-rag/README.md">projects/manual-rag/README.md</a> and <a href="../projects/manual-rag/bridge.py">bridge.py</a>. This supplied file loads fictional records from <a href="../projects/manual-rag/data/documents.json">data/documents.json</a>, validates their shape, and returns dictionaries. Leave both unchanged for reproducible checks.</p>
+<pre><code># Start: ai-stack/week-08
+cd projects/manual-rag
+../../.venv/bin/python -c "from bridge import load_documents; d=load_documents(); print(len(d), d[0]['doc_id'], d[0]['tenant'])"
+cd ../..</code></pre>
+<p>Expect <code>6 returns red</code>. The path is relative to the script via <code>Path(__file__)</code>, not the shell. The list comprehension validates each row; one malformed row stops the load. <code>model_dump()</code> returns ordinary dictionaries. The fixture has no uploader, queue or network call.</p>
+<h2>Make your integration choice</h2>
+<p>Read <a href="../projects/manual-rag/contract.md">contract.md</a> now; it is the behavior agreement, not an implementation. Open <a href="../projects/manual-rag/decisions.md">decisions.md</a> and record “bridge” with the evidence above, or describe your own completed extraction entry point. If extending real work, preserve its IDs and trusted ownership; attach chunking after successful extraction. Do not accept an owner supplied by arbitrary document text.</p>
+<p>Start <a href="../projects/manual-rag/data-flow.md">data-flow.md</a> with two lines: ingestion and query. Label what is stored and what crosses a provider boundary. Keep adding concrete fields as you learn. A failed embedding call must not be recorded as successful ingestion. Stable chunk IDs will make retrying writes safer, but the SQL and vector stores still do not form one atomic transaction.</p>
+<h2>Trace before designing</h2>
+<p>Guided question: ingestion succeeds for text storage but embedding fails. Is the document searchable? Where should status change?</p>
+<details><summary>Hint</summary><p>Ask which step creates the search representation.</p></details>
+<details><summary>Explained answer</summary><p>Raw text exists but no valid vectors exist yet. Mark indexing failed or pending, retain source identity, and retry with stable IDs. Mark searchable only after the required writes complete. An existing background job's “extracted” state need not mean “indexed.”</p></details>
+<p>Independent variation: explain what happens if the same document is indexed twice, then if its text changes without changing its version. Record both in decisions.md. Next, learn the boundary where the eventual answer is generated.</p>
+
+<p class="source">Primary reading: <a href="https://fastapi.tiangolo.com/tutorial/testing/">fastapi official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0001-start.html">← Previous</a><a href="0003-messages.html">Next →</a></nav></main></body></html>

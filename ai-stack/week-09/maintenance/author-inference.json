@@ -1,0 +1,65 @@
+{
+  "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+  "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+  "python": "3.12.14",
+  "torch": "2.14.0+cpu",
+  "transformers": "4.57.6",
+  "cpu": "",
+  "logical_cpus": 16,
+  "threads": 2,
+  "load_s": 33.35730997200017,
+  "max_rss_kib_linux": 1185948,
+  "runs": [
+    {
+      "repeat": 0,
+      "input_tokens": 52,
+      "wall_s": 0.9633150860001933,
+      "process_cpu_s": 1.865582364999998,
+      "prompt": "Answer using only this fact: Refunds take 30 days. How long do refunds take?",
+      "output": "Refunds take 30 days."
+    },
+    {
+      "repeat": 0,
+      "input_tokens": 45,
+      "wall_s": 2.7397228499999073,
+      "process_cpu_s": 5.305871219,
+      "prompt": "Return only JSON with one key days and the integer value 30.",
+      "output": "```python\nimport json\n\ndef get_json_with_one_key(data):\n    return json.loads(data)\n\ndata ="
+    },
+    {
+      "repeat": 0,
+      "input_tokens": 55,
+      "wall_s": 2.709707126000012,
+      "process_cpu_s": 5.256795007000001,
+      "prompt": "Context: Support opens at 09:00 UTC. What is the refund policy? If absent, say unknown.",
+      "output": "The refund policy for support is as follows:\n\n1. If you are absent from the support team, you will be required to provide a confirmation of your absence"
+    },
+    {
+      "repeat": 1,
+      "input_tokens": 52,
+      "wall_s": 0.8862028329999703,
+      "process_cpu_s": 1.7066567219999982,
+      "prompt": "Answer using only this fact: Refunds take 30 days. How long do refunds take?",
+      "output": "Refunds take 30 days."
+    },
+    {
+      "repeat": 1,
+      "input_tokens": 45,
+      "wall_s": 2.0317326400002003,
+      "process_cpu_s": 3.838539832000002,
+      "prompt": "Return only JSON with one key days and the integer value 30.",
+      "output": "```python\nimport json\n\ndef get_json_with_one_key(data):\n    return json.loads(data)\n\ndata ="
+    },
+    {
+      "repeat": 1,
+      "input_tokens": 55,
+      "wall_s": 2.0075813239998297,
+      "process_cpu_s": 3.803051221000004,
+      "prompt": "Context: Support opens at 09:00 UTC. What is the refund policy? If absent, say unknown.",
+      "output": "The refund policy for support is as follows:\n\n1. If you are absent from the support team, you will be required to provide a confirmation of your absence"
+    }
+  ],
+  "evidence_kind": "Author verification only; not learner progress",
+  "verification_date": "2026-09-18",
+  "limits": "Single CPU process; first load includes downloads; no serving/concurrency or GPU benchmark."
+}

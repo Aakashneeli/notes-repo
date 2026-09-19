@@ -1,0 +1,7 @@
+# Core lab; real Qdrant local mode, no server or model download.
+fastapi>=0.115,<1
+pydantic>=2.10,<3
+qdrant-client>=1.15,<2
+httpx>=0.28,<1
+pytest>=8,<10
+uvicorn>=0.34,<1

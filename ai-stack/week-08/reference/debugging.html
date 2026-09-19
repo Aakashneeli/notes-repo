@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RAG debugging card</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Reference / Print card</p><h1>Find the first broken boundary</h1>
+<ol><li>Input: trusted tenant, valid document/question, correct version?</li><li>Chunk: complete needed sentence, stable IDs and correct offsets?</li><li>Embedding: same model/configuration and dimension, finite nonzero values?</li><li>Store: completed write, reopened correct path, no old-version ambiguity?</li><li>Retrieval: expected source present after required filter and top-k?</li><li>Context: useful retrieved source actually selected within budget?</li><li>Generation: oracle-context answer supported, schema valid, repair bounded?</li><li>Output: cited IDs belong to selected context, claims supported, errors sanitized?</li></ol>
+<p>Record question ID, safe metadata, selected IDs, error class and timings. Do not log keys or private text. Keep synthetic, real-encoder and live-provider evidence separate.</p>
+<pre><code># From ai-stack/week-08:
+.venv/bin/python -m pytest maintenance -q
+.venv/bin/python -m pytest practice/test_exercises.py -q
+.venv/bin/python -m pytest projects/manual-rag/tests -q</code></pre>
+<p>The first suite checks completed teaching fragments. The latter two intentionally fail before learner implementation. Stop the local server before reopening its embedded database.</p>
+<p><a href="../lessons/0011-evaluation.html">Evaluation worked example</a> · <a href="../projects/manual-rag/contract.md">Full contract</a> · <a href="../RESOURCES.md">Sources</a></p></main></body></html>

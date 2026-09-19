@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>04 · Validate an answer, then decide whether to retry</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 04</p><h1>Validate an answer, then decide whether to retry</h1><p class="lede">Separate JSON syntax, schema validity and evidence support.</p>
+
+<p>JSON is a notation; a schema specifies its allowed shape; application checks decide whether values are acceptable. None of these by itself establishes truth. <code>{"answer":"90 days","citations":["c1"]}</code> is syntactically valid even when c1 says 30 days.</p>
+<h2>Three gates</h2>
+<p>Read <code>Answer</code> and <code>parse_answer</code> in <a href="../practice/examples.py">examples.py</a>. <code>BaseModel</code> defines named fields. <code>answer: str</code> and <code>citations: list[str]</code> are type declarations used by validation. Strict mode avoids unwanted coercion; extra fields are forbidden. <code>model_validate_json</code> combines parsing and schema validation. The separate allowed-ID test checks context membership.</p>
+<pre><code># Start: ai-stack/week-08
+.venv/bin/python -m practice.examples validation</code></pre>
+<p>Expect one dictionary with citation c1, then <code>rejected</code> twice. Trace the second case: JSON parsing succeeds, but citations is a string rather than a list. Trace the third: the schema passes, but “secret” was not supplied as evidence. A plain string containing fenced Markdown would fail JSON parsing unless deliberately preprocessed; do not silently strip arbitrary text to make failures disappear.</p>
+<p><a href="https://docs.pydantic.dev/latest/concepts/models/">Pydantic's model documentation</a> is the source for the local validation mechanism. The provider's <a href="https://console.groq.com/docs/structured-outputs">structured-output documentation</a> describes JSON-schema request configuration. Model support varies; JSON object mode and strict schema mode are distinct. Even a schema-conforming reply still needs application checks.</p>
+<h2>A bounded repair trace</h2>
+<p>To connect the local schema to a compatible provider request, generate the schema with <code>Answer.model_json_schema()</code>. It describes an object with required answer/citations fields, string/list item types and no additional properties. The request fragment below belongs beside model/messages in a provider body; first verify that your selected model supports it. This changes generation constraints, not the local checks:</p>
+<pre><code>response_format = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "cited_answer",
+        "strict": True,
+        "schema": Answer.model_json_schema(),
+    },
+}</code></pre>
+<p>From the weekly root, inspect without sending a request: <code>.venv/bin/python -c "from practice.examples import Answer; print(Answer.model_json_schema())"</code>. Expect required answer/citations and additionalProperties=False. If the provider rejects the schema or model feature, diagnose that configuration error; it is not an invalid-output repair attempt. Record the distinction in your weekly log before continuing.</p>
+<p>For this lab, permit at most two generation calls. Attempt 1 returns citations as a string. Catch the validation error, ask for the required shape using a short sanitized repair instruction, and try once more. Attempt 2 returns a valid structure: continue. If it also fails, raise the generic invalid-output error. Do not recursively retry forever. Timeouts and credential failures are different failure classes; this parsing function must not retry them.</p>
+<pre><code>Attempt 1 → parse → schema fails → one repair request
+Attempt 2 → parse → schema passes → IDs checked → return
+                         or fails → bounded error</code></pre>
+<p>Read <code>answer_question</code>'s contract in <a href="../projects/manual-rag/contract.md">contract.md</a>. Do not implement the whole function yet; in the weekly log write pseudocode with the two-attempt limit and terminal error. A Python <code>try</code> encloses the operation that may fail; <code>except</code> should name expected validation exceptions, not swallow every bug in the pipeline.</p>
+<h2>Guided diagnosis</h2>
+<p>A reply contains <code>{"answer":30,"citations":["c1"]}</code>. What fails? What if the answer is the string “30” but c1 belongs to another tenant?</p>
+<details><summary>Hint</summary><p>Check type first, then trace where allowed IDs came from.</p></details>
+<details><summary>Explained answer</summary><p>The number fails strict string validation. The second can pass schema validation; safe retrieval must exclude the other tenant before prompt construction, and citation checking must allow only supplied IDs. If that private chunk already entered the prompt, output validation cannot undo the disclosure.</p></details>
+<p>Independent variation: propose a test for a valid cited answer whose sentence contradicts the source. Explain why this needs an evidence-support judgement beyond schema checks. Record the case in <a href="../weekly-logs/mistakes.md">weekly-logs/mistakes.md</a> if it exposed a misconception; this log is learner-owned, not an automatic error dump.</p>
+
+<p class="source">Primary reading: <a href="https://console.groq.com/docs/structured-outputs">structured official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0003-messages.html">← Previous</a><a href="0005-chunking.html">Next →</a></nav></main></body></html>

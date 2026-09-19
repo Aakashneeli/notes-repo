@@ -1,0 +1,5 @@
+@import url("../../../backend/week-04/assets/course.css");
+:root{--green:#365772;--accent:#92532e;--wash:#e6edf0}
+.skip{position:absolute;left:-10000px}.skip:focus{position:static}
+dt{font-weight:bold}dd{margin-bottom:1em}
+@media print{body{font-size:10.5pt;line-height:1.45}h1{font-size:27pt}}

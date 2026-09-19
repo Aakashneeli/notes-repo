@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>10 · Expose ingest, search and ask</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 10</p><h1>Expose ingest, search and ask</h1><p class="lede">Connect the pieces through a testable HTTP boundary.</p>
+
+<p>The service layer should be understandable before adding HTTP. The route's job is to validate a request, call those pieces and map failures to a response. Dependency injection here means passing store/embed/llm into <code>create_app</code>; it lets a test replace slow or costly boundaries with deterministic functions.</p>
+<h2>A small route trace</h2>
+<p>For POST /search with {"question":"return deadline"}, a Pydantic body validates the question, the injected encoder returns a vector, Store searches within trusted tenant red, and the route returns hits. For /ask, the same retrieval feeds answer_question. For /ingest, a validated source becomes chunks, each is embedded, and the store upserts them. Review <a href="../../../backend/week-04/lessons/0004-routes-and-input-locations.html">the existing route lesson</a> only if decorator/body syntax blocks this step.</p>
+<pre><code># Miniature shape example; not the project implementation
+@app.post("/echo")
+def echo(body: EchoBody):
+    return {"text": body.text}</code></pre>
+<p>The decorator registers a function for an HTTP method/path; body is the validated input model instance. Returning a dictionary lets FastAPI serialize JSON. Use synchronous routes for this synchronous tiny lab; placing blocking work inside an async route without care would block its event loop. Production concurrency is outside this week's implementation.</p>
+<h2>Implement and test the seam</h2>
+<p>Edit create_app in rag.py against contract.md. Reject extra fields, wrong types and whitespace-only questions. The trusted fixture tenant comes from create_app's argument; the request may not choose it. Map invalid generated output to a generic 502, provider timeout to 504. Do not turn unexpected bugs into a misleading success.</p>
+<pre><code># Start: ai-stack/week-08
+.venv/bin/python -m pytest projects/manual-rag/tests -q</code></pre>
+<p>Expect all contract tests to pass only after the assessed implementation. Read tests to understand both wanted behavior and limits. Add your own tests in a new <code>projects/manual-rag/tests/test_variations.py</code> for duplicate ingestion, excessive text, query dimension mismatch, unsupported but validly cited claims, and changed versions. Leave supplied tests intact.</p>
+<h2>Operate the local fixture</h2>
+<p>Read <a href="../projects/manual-rag/run_local.py">run_local.py</a>. It supplies three keyword-count coordinates and a generator that always abstains. Those completed adapters let you observe HTTP/storage wiring; they are deliberately not a finished semantic RAG solution. <code>runtime/project-db</code> is generated persistent output, ignored by Git. The finally block closes the store after server shutdown.</p>
+<pre><code># Terminal A, weekly root; starts only after rag.py is implemented
+.venv/bin/python projects/manual-rag/run_local.py</code></pre>
+<pre><code># Terminal B, weekly root
+curl -sS http://127.0.0.1:8008/ingest -H 'Content-Type: application/json' -d '{"doc_id":"demo","title":"Returns","text":"A receipt is required.","version":1}'
+curl -sS http://127.0.0.1:8008/search -H 'Content-Type: application/json' -d '{"question":"receipt"}'
+curl -sS http://127.0.0.1:8008/ask -H 'Content-Type: application/json' -d '{"question":"receipt"}'</code></pre>
+<p>Expect {"chunks":1}, a hit with trusted tenant red and ID red:demo:v1:0, then {"answer":"Insufficient evidence.","citations":[]}. That last response proves mock wiring only. Stop Terminal A with Ctrl-C before opening the same embedded store elsewhere. A port conflict means another listener owns 8008; diagnose it before changing application code.</p>
+<p>For real retrieval/generation, create learner-owned <code>projects/manual-rag/run_semantic.py</code> after completing the tests: wire Lesson 8's encoder, a separate persistent store path, and a provider adapter returning the content string from Lesson 3. Keep the API local. First run retrieval without a provider; then use approved fictional text only for learner-chosen live calls. Record model IDs, settings, token usage if supplied and costs checked. Do not commit keys.</p>
+<h2>Predict a failure</h2>
+<p>A provider raises TimeoutError("SECRET"). What should the client and log see?</p>
+<details><summary>Hint</summary><p>Separate public error class from sensitive exception contents.</p></details>
+<details><summary>Explained answer</summary><p>The client sees generic 504 detail. A safe event can contain request ID, provider label, elapsed time and error class, but not the exception's raw message or request payload. Test the response for absence of SECRET.</p></details>
+<p>Independent variation: inject an encoder that fails once during ingestion. Explain what data exists after failure and how stable IDs support recovery. Document the result in <a href="../projects/manual-rag/debugging-note.md">debugging-note.md</a>, completing its reproduction/fix/regression fields.</p>
+
+<p class="source">Primary reading: <a href="https://fastapi.tiangolo.com/tutorial/testing/">fastapi official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0009-context.html">← Previous</a><a href="0011-evaluation.html">Next →</a></nav></main></body></html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>07 · Persist and filter a local vector store</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 07</p><h1>Persist and filter a local vector store</h1><p class="lede">Verify retrieval scope and persistence using known vectors.</p>
+
+<p>A vector store connects point identity, a numerical vector and payload. Payload is metadata/text carried beside the vector; a collection specifies compatible vector settings. We use Qdrant's embedded local mode for a small single-process lab. No server, cloud account or GPU is needed. A later server deployment has different concurrency and operational properties.</p>
+<h2>Read, run, trace</h2>
+<pre><code># Start: ai-stack/week-08
+.venv/bin/python -m practice.examples store</code></pre>
+<p>Expect <code>['red:1']</code>. In <code>client_demo</code>, a temporary directory holds the real local database. The example creates a 3-dimensional cosine collection, inserts two points, closes, reopens and queries. Both points have the same vector; only the red tenant should be returned. The temporary directory is cleaned after the client closes. This demonstrates local persistence, not a running Qdrant server.</p>
+<p><code>PointStruct</code> describes ID/vector/payload. <code>upsert</code> inserts or updates the same point ID. <code>query_points(...).points</code> returns scored matches. <code>with_payload=True</code> requests source fields needed by later prompts. The project uses UUIDs derived from stable chunk IDs because arbitrary citation strings are not Qdrant point IDs.</p>
+<h2>Filter before choosing top-k</h2>
+<p><a href="https://qdrant.tech/documentation/concepts/filtering/">Payload filtering</a> expresses exact conditions that vector similarity cannot guarantee. In our fixture red's best point has score lower than blue's. Searching globally for one result then removing blue can leave no answer even when red has useful evidence. Put the trusted tenant condition inside the database query. Filtering afterwards also risks disclosing private context before removal.</p>
+<p>As a tiny bridge, implement <code>allowed_hits</code> in practice/exercises.py and check it:</p>
+<pre><code>.venv/bin/python -m pytest practice/test_exercises.py -k filter -q</code></pre>
+<details><summary>Hint</summary><p>Use a comprehension with an exact metadata comparison; rows with no tenant do not match.</p></details>
+<details><summary>Explained beginner answer</summary><pre><code>return [hit for hit in hits if hit.get("tenant") == tenant]</code></pre><p>This teaches the boolean condition only. Do not use post-filtering as your project's retrieval implementation; place the condition in Qdrant's query.</p></details>
+<h2>Implement the storage lab</h2>
+<p>From the weekly root edit only <code>Store</code> in projects/manual-rag/rag.py. Follow contract.md for dimensions, finite nonzero vectors, equal batch counts and UUID mapping. Validate the entire batch before writing any point: otherwise one bad vector can leave a partially accepted batch. Content deduplication must preserve provenance and tenant ownership.</p>
+<pre><code>.venv/bin/python -m pytest projects/manual-rag/tests -k 'store or collection' -q</code></pre>
+<p>Each test uses its own temporary path; it does not touch your runtime database. A persistent-path lock error often means a previous client is still open. Close the client in <code>finally</code>, which runs even after an error; do not delete an unrelated database to clear a lock. Reopening with the wrong dimension should fail clearly, without retaining the lock.</p>
+<p>Independent variation: add two different tenants with identical source text, then upsert one updated chunk. Predict the count and ownership before querying. Explain why random IDs on every retry create duplicates. Record persistence/filter evidence and a failure diagnosis in the weekly log, then move to a real embedding.</p>
+
+<p class="source">Primary reading: <a href="https://github.com/qdrant/qdrant-client">qdrant official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0006-vectors.html">← Previous</a><a href="0008-real-embeddings.html">Next →</a></nav></main></body></html>

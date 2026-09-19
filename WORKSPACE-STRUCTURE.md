@@ -14,6 +14,10 @@ Current locations:
 
 - `cloud-devops/week-07/`: source Week 7 — Docker (Docker, Compose, Local Production Shape, Logging, Health Checks, and CI Intro).
 
+- `ai-stack/week-08/`: source Week 8 — RAG (Raw LLM APIs, Embeddings, Vector DBs, Manual RAG, and Retrieval Evaluation).
+
+- `ai-stack/week-09/`: source Week 9 — Agents (LangGraph, LangSmith, Tool Use, Hugging Face, Ollama, llama.cpp, and vLLM Concepts).
+
 Each topic may have a short README and HTML index linking its weeks. Each weekly root uses:
 
 ```text

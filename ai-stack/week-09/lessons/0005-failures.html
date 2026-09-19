@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>05 — End safely when evidence is weak</title><link rel="stylesheet" href="../assets/course.css"></head><body><a class="skip" href="#main">Skip to lesson</a><main id="main"><nav aria-label="Course"><a href="../index.html">Week 09 desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 09 / Lesson 05</p><h1>End safely when evidence is weak</h1><p class="lede">Implement validation and fallback while keeping failures diagnosable.</p>
+<p>A graph makes intermediate decisions visible. It does not make bad evidence good. Your answer node should only run when you have useful authorized hits. Your validation node should reject malformed or unsupported citation IDs before returning a response.</p>
+<h2>Trace weak retrieval before coding</h2>
+<p>For <code>weak</code>, the fixture returns score 0.2. With our teaching threshold 0.5, retained hits are empty. Route to fallback, set reason=weak_retrieval, clear citations, write the fixed abstention and END. The generator should never run. The score is a fixture value, not a calibrated probability of truth; real thresholds depend on encoder, metric and data.</p>
+<p>For <code>bad citation refund</code>, retrieval succeeds but generation returns ID “foreign”. The validator compares cited IDs with IDs in authorized hits. It rejects that ID, writes invalid_answer and falls back. A valid citation ID can still accompany a false sentence; checking membership is necessary but not sufficient for factual support.</p>
+<h2>A worked validation mechanism in a tiny example</h2>
+<pre><code>allowed = {&#x27;T-01&#x27;, &#x27;T-02&#x27;}
+proposed = [&#x27;T-01&#x27;, &#x27;T-99&#x27;]
+print(all(item in allowed for item in proposed))  # False
+print(all(item in allowed for item in []))        # True</code></pre>
+<p>A set supports membership checks. The generator expression produces one Boolean per item; <code>all</code> requires all of them to be true. The empty case shows why you must separately require nonempty citations. Also validate the container and each element's type before using it; a dictionary or a string is not the intended list of IDs.</p>
+<p>From the weekly root, edit <code>workflow.py</code>'s answer, validation and fallback behavior. Catch the contract's <code>TimeoutError</code> around external operations, converting it to a specific reason. Do not catch every exception and return “weak retrieval”: a misspelled key is a programming error you need to see.</p>
+<pre><code>.venv/bin/python -m pytest projects/agent-rag/tests -q</code></pre>
+<p>Before the API exists, <code>test_api</code> remains an expected failure. Graph tests should now pass. Save output and one failure explanation in <code>weekly-logs/week-09.md</code>. In <a href="../projects/agent-rag/debugging-note.md">debugging-note.md</a>, document one actual bug with a regression test. Add cases for empty citations and blank answer; then vary the threshold and identify a case whose route changes.</p>
+<details><summary>Hint — open after trying</summary><p>Give each failure a reason before entering a single fallback node. Clear every response field that could carry a stale success.</p></details><details><summary>Explained answer — compare with your attempt</summary><p>Weak retrieval must skip generation; malformed output must discard the draft; tool timeout is distinct from “no matching document”. An END edge and a bounded invocation prevent accidental endless work. A recursion limit does not interrupt a slow network socket: real clients need their own timeouts.</p></details>
+<h2>State is not persistence</h2>
+<p>Ordinary invocation carries state for that run. A checkpointer can retain snapshots for a thread; a store can retain application data across threads. A thread ID labels a checkpoint history, not an authenticated user. In-memory checkpoints disappear on restart. The assessed API deliberately uses fresh runs; accidental shared state could leak an earlier answer.</p>
+<p>Read the optional <code>memory=True</code> branch in the completed example. From the weekly root, run this small persistence experiment:</p>
+<pre><code>.venv/bin/python - &lt;&lt;&#x27;PYCODE&#x27;
+from practice.examples import ticket_graph
+graph = ticket_graph(memory=True)
+config = {&#x27;configurable&#x27;: {&#x27;thread_id&#x27;: &#x27;blue-1&#x27;}}
+graph.invoke({&#x27;text&#x27;:&#x27;outage&#x27;}, config)
+print(graph.get_state(config).values[&#x27;queue&#x27;])
+print(graph.get_state({&#x27;configurable&#x27;: {&#x27;thread_id&#x27;:&#x27;blue-2&#x27;}}).values)
+PYCODE</code></pre>
+<p>Expect on-call, then <code>{}</code>. A new graph instance with a new memory saver loses blue-1 too. Record why this is not durable production storage. Append loop/stale-state/false-citation failure modes in your project notes, then proceed to API integration.</p>
+<p class="source">Primary reading: <a href="https://docs.langchain.com/oss/python/langgraph/persistence">official documentation for this lesson</a>. Use it to confirm one mechanism you just tried; it does not replace your practice.</p><div class="page-nav"><a href="0004-tool.html">← Previous lesson</a><a href="0006-api.html">Next: Put the graph behind the service boundary →</a></div><footer>Ask the tutor a follow-up whenever a state change, command or failure is unclear. Bring your prediction and smallest observed mismatch. Record help used; understanding grows through attempts.</footer></main></body></html>

@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Diagnose one boundary at a time</title><link rel="stylesheet" href="../assets/course.css"></head><body><a class="skip" href="#main">Skip to content</a><main id="main"><nav><a href="../index.html">Week 09 study desk</a><a href="../plan/file-map.html">File map</a></nav><h1>Diagnose one boundary at a time</h1>
+<p>Start at ai-stack/week-09. Preserve your smallest failing input and actual output before changing code.</p>
+<table><tr><th>Observation</th><th>Inspect next</th></tr>
+<tr><td>ModuleNotFoundError</td><td>Which Python ran? Use .venv/bin/python and the pinned installation, then rerun author checks.</td></tr>
+<tr><td>NotImplementedError</td><td>Learner stubs are intentionally unfinished. Identify the corresponding lesson before implementing.</td></tr>
+<tr><td>KeyError in a node</td><td>Find the first reader and expected writer of that state key; trace the route.</td></tr>
+<tr><td>Unexpected node or repeated loop</td><td>Check branch labels and unconditional edges; use updates stream and the step limit.</td></tr>
+<tr><td>False success on weak retrieval</td><td>Inspect retained hits and whether generation was called; do not fix it with a nicer fallback string.</td></tr>
+<tr><td>Unauthorized lookup</td><td>Trace trusted tenant origin and filtering inside the access boundary.</td></tr>
+<tr><td>No live traces</td><td>Verify live flag, project/region/workspace config and upload errors; never print keys.</td></tr>
+<tr><td>Slow request</td><td>Inspect root wall time and relevant child spans; don't double-count parents.</td></tr>
+<tr><td>Local inference OOM or swap</td><td>Check weights plus runtime/context memory. Stop the process; reduce workload or use a smaller model.</td></tr>
+<tr><td>Fluent but wrong answer</td><td>Compare retrieved text, template, generation and validation separately. Citation IDs alone are not support.</td></tr></table>
+<p><a href="../lessons/0005-failures.html">Failure lesson</a> · <a href="../lessons/0007-trace-reading.html">Trace lesson</a> · <a href="../projects/agent-rag/debugging-note.md">Record a real repair</a></p></main></body></html>

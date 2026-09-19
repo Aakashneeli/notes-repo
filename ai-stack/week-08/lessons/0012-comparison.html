@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>12 · Choose a store with a reason</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 12</p><h1>Choose a store with a reason</h1><p class="lede">Compare setup, filters, persistence and deployment fit without extra provisioning.</p>
+
+<p>The roadmap permits a conceptual comparison when setup time is tight. You already practised one real local store; now compare Qdrant with pgvector and understand where Chroma and a managed service differ. An evidence-backed choice is more useful than installing four products.</p>
+<div class="table-scroll" tabindex="0"><table><caption>Questions to investigate, with starting distinctions</caption><thead><tr><th>Option</th><th>Setup and data model</th><th>Decision pressure</th></tr></thead><tbody>
+<tr><td>Qdrant local</td><td>Python client, embedded persistent path, points/payload/filter</td><td>Simple small lab; server deployment/concurrency must be assessed separately</td></tr>
+<tr><td>pgvector</td><td>PostgreSQL extension; vector columns beside relational data; SQL WHERE clauses</td><td>Fits an existing Postgres operational boundary; extension/index/query choices add work</td></tr>
+<tr><td>Chroma</td><td>Collection-oriented document/embedding API with persistent-client options</td><td>Check embedding defaults, filtering and local versus server topology explicitly</td></tr>
+<tr><td>Pinecone-style managed</td><td>Hosted index, record IDs/vectors/metadata, account and network boundary</td><td>Offloads some operations; adds service cost, data-location and provider dependency decisions</td></tr>
+</tbody></table></div>
+<p>Use the <a href="https://github.com/pgvector/pgvector">pgvector project documentation</a>, <a href="https://docs.trychroma.com/docs/overview/getting-started">Chroma getting-started guide</a> and <a href="https://docs.pinecone.io/guides/index-data/data-modeling">Pinecone data-model guide</a> to verify these starting distinctions. This table is not a claim that one store universally wins or that managed filtering is authorization by itself.</p>
+<h2>Understand the SQL analogy</h2>
+<pre><code>-- Conceptual only: extension-enabled PostgreSQL, not run in this lab
+SELECT chunk_id, text
+FROM chunks
+WHERE tenant = 'red'
+ORDER BY embedding &lt;=&gt; '[1,0,0]'
+LIMIT 3;</code></pre>
+<p>The filter scopes records; the distance expression orders them; LIMIT bounds the result. For cosine distance, smaller is closer, whereas the Qdrant cosine score is ranked larger-first. Do not copy a threshold unchanged between distance and similarity. The SQL needs a real schema, extension and dimension declaration before execution; do not run it against an earlier learner database without a separate migration plan.</p>
+<h2>Write the comparison</h2>
+<p>From the weekly root edit <a href="../projects/manual-rag/store-comparison.md">store-comparison.md</a>. For Qdrant versus pgvector, give setup, filtering, persistence and deployment fit a row each. Cite a primary source, record what you actually tested, then distinguish inference. Add a brief Chroma/managed tradeoff paragraph. Recommend one for this small corpus and a concrete condition that would make you change.</p>
+<p>Guided scenario: your production backend already operates PostgreSQL and needs relational ownership checks. What favors pgvector, and what remains uncertain?</p>
+<details><summary>Hint</summary><p>Consider the number of operational systems, then separate that from measured retrieval latency.</p></details>
+<details><summary>Explained answer</summary><p>Keeping source metadata and vectors near existing relational ownership can reduce integration boundaries. That does not prove query latency, index behavior or operational capacity for your workload. State those as measurements needed rather than inventing benchmarks.</p></details>
+<p>Independent variation: a second application needs a separately scalable retrieval service. Revisit the choice and list one benefit and one new failure boundary. No hosted account or paid service is needed for this note.</p>
+
+<p class="source">Primary reading: <a href="https://github.com/pgvector/pgvector">pg official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0011-evaluation.html">← Previous</a><a href="0013-reading-review.html">Next →</a></nav></main></body></html>

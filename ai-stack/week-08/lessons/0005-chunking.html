@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>05 · Choose boundaries you can explain</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 05</p><h1>Choose boundaries you can explain</h1><p class="lede">Trace overlapping chunks and implement deterministic chunk records.</p>
+
+<p>Chunking divides a source into pieces that can be retrieved independently. A whole long document may contain many unrelated topics; a tiny excerpt may omit the condition that makes a statement true. A chunk is useful only if it retains enough context to answer a question.</p>
+<h2>Watch the indices</h2>
+<p>Our teaching fixture uses words, not model tokens. <code>split()</code> normalizes whitespace into a list of words; <code>words[start:end]</code> includes start but excludes end. With size 4 and overlap 1, inspect the completed window function:</p>
+<pre><code># Start: ai-stack/week-08
+.venv/bin/python -m practice.examples chunking</code></pre>
+<p>Input words are one, two, three, four, five, six, seven. Window [0:4] yields “one two three four”. The next start is 4−1=3; window [3:7] yields “four five six seven”. Stop at the end. Do not emit an extra “seven” tail. The overlap repeats “four” so a fact crossing that boundary can remain nearby.</p>
+<p>Overlap must be smaller than size: overlap 4 with size 4 makes no forward progress. Zero overlap is valid. Before writing chunks, implement <code>safe_overlap</code> in <a href="../practice/exercises.py">exercises.py</a>, then run:</p>
+<pre><code>.venv/bin/python -m pytest practice/test_exercises.py -k overlap -q</code></pre>
+<details><summary>Hint</summary><p>Check types before comparisons. In Python, bool is an integer subclass, so use an exact type check for this contract.</p></details>
+<details><summary>Explained beginner answer</summary><pre><code>return (type(size) is int and type(overlap) is int
+        and size &gt; 0 and 0 &lt;= overlap &lt; size)</code></pre><p>The short-circuit “and” chain avoids invalid comparisons after a bad type. Requiring an integer keeps slicing valid.</p></details>
+<h2>Fixed windows versus semantic-ish boundaries</h2>
+<p>Suppose a document says “Returns: Keep your receipt. Shipping: Express takes two days.” A fixed character cut can split “receipt”; a word window may combine unrelated headings. A semantic-ish splitter can separate paragraphs/headings, gather complete sentences until a target size, then split oversized paragraphs with a fallback. This is a heuristic, not proof of semantic completeness. Abbreviations, tables and very long sentences break naive punctuation splitting.</p>
+<p>Guided practice in the weekly log: split the returns document at sentence boundaries. Compare with size 8/overlap 2. Which chunks retain “of delivery” and “receipt”? Independent variation: join two topics into one paragraph and explain why your boundary heuristic might fail. For the assessed implementation use the fixed-word contract so checks are deterministic; document when you would switch policies.</p>
+<h2>Now add identity</h2>
+<p>Open learner-owned <a href="../projects/manual-rag/rag.py">rag.py</a> and implement only <code>chunk_document</code>. Each record keeps doc_id, tenant, title, version, word offsets and text. The contract's chunk ID includes tenant/document/version/start. At a later policy change, version or collection identity must change too; old vectors must not silently represent different text.</p>
+<pre><code>.venv/bin/python -m pytest projects/manual-rag/tests -k chunk -q</code></pre>
+<p>Read <a href="../projects/manual-rag/tests/test_contract.py">test_contract.py</a> for expected behavior; leave it unchanged. <a href="../projects/manual-rag/tests/conftest.py">conftest.py</a> inserts the project directory into the test import path, letting <code>from rag import ...</code> work from the weekly root. This is small lab infrastructure, not a package-installation lesson.</p>
+<p>Expect only chunk checks to pass after this step; store/API functions remain unfinished. Store the run and your boundary comparison in the weekly log. Remember that words are not model tokens: read the chosen model card's truncation limit before real embeddings. A chunk silently truncated by the encoder can retain text the vector never represented.</p>
+
+<p class="source">Primary reading: <a href="https://huggingface.co/docs/hub/model-cards">cards official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="0004-structured-output.html">← Previous</a><a href="0006-vectors.html">Next →</a></nav></main></body></html>

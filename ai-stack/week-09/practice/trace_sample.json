@@ -1,0 +1,30 @@
+{
+  "kind": "synthetic teaching trace",
+  "root": {
+    "name": "request",
+    "start_ms": 0,
+    "end_ms": 130
+  },
+  "children": [
+    {
+      "name": "route",
+      "start_ms": 0,
+      "end_ms": 2
+    },
+    {
+      "name": "retrieve",
+      "start_ms": 2,
+      "end_ms": 22
+    },
+    {
+      "name": "answer",
+      "start_ms": 22,
+      "end_ms": 122
+    },
+    {
+      "name": "validate",
+      "start_ms": 122,
+      "end_ms": 130
+    }
+  ]
+}

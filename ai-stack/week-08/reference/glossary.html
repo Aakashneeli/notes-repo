@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Week 8 glossary</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Reference / Week 08</p><h1>Words with precise jobs</h1><dl>
+<dt>Document</dt><dd>A whole source with identity, ownership, version and extracted text.</dd>
+<dt>Chunk</dt><dd>An excerpt with enough provenance to locate it in a source.</dd>
+<dt>Embedding</dt><dd>A numerical representation produced by a particular model/configuration.</dd>
+<dt>Dimension</dt><dd>Number of coordinates in a vector. Equal dimension alone does not imply compatible models.</dd>
+<dt>Cosine similarity</dt><dd>Alignment of two nonzero vectors; larger is closer for this lab's metric, not a probability.</dd>
+<dt>Payload / metadata</dt><dd>Stored fields beside the vector, including tenant, source identity, version and text.</dd>
+<dt>Tenant</dt><dd>An ownership boundary supplied by trusted application identity, not guessed from text.</dd>
+<dt>Upsert</dt><dd>Insert a new identity or update the record with that same identity.</dd>
+<dt>Idempotent ingestion</dt><dd>Repeating the same ingestion produces the same intended stored state.</dd>
+<dt>Top-k</dt><dd>At most k ranked candidates, after required access filters.</dd>
+<dt>Context</dt><dd>The actual selected evidence sent to the generator, potentially a subset of retrieved candidates.</dd>
+<dt>Reranking</dt><dd>Reordering retrieved candidates using a further relevance judgement.</dd>
+<dt>Citation</dt><dd>An identifier the application resolves to supplied source evidence. Identity validity is not factual support.</dd>
+<dt>Schema</dt><dd>Rules for the structure and types of a value.</dd>
+<dt>Abstention</dt><dd>An explicit insufficient-evidence response instead of an unsupported answer.</dd>
+<dt>Golden question</dt><dd>A question with independently checked source/answer criteria for evaluation.</dd>
+<dt>Hit@k</dt><dd>Here: fraction of answerable questions with any expected document among top-k. Not all-source recall.</dd>
+<dt>Hallucination note</dt><dd>A recorded unsupported claim with the relevant missing or contradictory evidence.</dd>
+<dt>Mock / fixture</dt><dd>A controlled replacement or known input used to isolate behavior; not evidence of a live integration.</dd>
+</dl><p><a href="../lessons/0001-start.html">Begin the course</a> · <a href="../lessons/0011-evaluation.html">Evaluate a failure</a></p></main></body></html>

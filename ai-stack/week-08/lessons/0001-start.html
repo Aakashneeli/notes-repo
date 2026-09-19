@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>01 · Find your starting point</title><link rel="stylesheet" href="../assets/course.css"><script src="../../../backend/week-04/assets/print.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course"><a href="../index.html">Study desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/glossary.html">Glossary</a></nav><p class="eyebrow">Week 08 / Lesson 01</p><h1>Find your starting point</h1><p class="lede">Choose a prerequisite bridge using evidence, then run one known-good example.</p>
+
+<p>Week 8 turns an ingestion backend into a system that can retrieve evidence and answer questions about it. The numbered source title is <em>Raw LLM APIs, Embeddings, Vector DBs, Manual RAG, and Retrieval Evaluation</em>. Its place is after local backend operation and before agent frameworks. A framework cannot repair a missing source passage.</p>
+<h2 id="orientation">A desk, not a mastery claim</h2>
+<p>Read <a href="../README.md">README.md</a> for the source/path mapping and <a href="../MISSION.md">MISSION.md</a> for the goal. <a href="../RESOURCES.md">RESOURCES.md</a> holds annotated primary sources; <a href="../AI-USAGE.md">AI-USAGE.md</a> describes hint-first help. Leave <a href="../NOTES.md">NOTES.md</a> to the tutor. Existing records establish exposure, so we will measure a starting point rather than presume earlier weeks were mastered.</p>
+<pre><code>cd /home/an10/code/notes-repo
+cd ai-stack/week-08
+pwd
+ls lessons practice projects</code></pre>
+<p>Expect this week's path and three directories. Open <a href="../plan/README.md">plan/README.md</a> to choose a flexible sequence; read <a href="../plan/coverage.md">coverage</a> and <a href="../plan/assessment.md">assessment</a> as targets. The learner updates <a href="../plan/progress.md">progress</a> only with linked evidence. <a href="../plan/file-map.html">The file map</a> locates an item when needed; do not memorize the tree.</p>
+<h2>Set up once</h2>
+<p>Read <a href="../requirements.in">requirements.in</a>: FastAPI handles HTTP, Pydantic validates data, Qdrant stores vectors, HTTPX calls providers and supports tests, pytest checks behavior, Uvicorn serves HTTP. <a href="../requirements.lock">requirements.lock</a> pins the tested dependency set. Leave both unchanged initially. Python 3.14 was verified; older interpreters may not support these exact pins. Use an isolated environment:</p>
+<pre><code># Start: ai-stack/week-08
+UV_CACHE_DIR=/tmp/week08-uv-cache uv venv .venv --python python3
+UV_CACHE_DIR=/tmp/week08-uv-cache uv pip install --python .venv/bin/python -r requirements.lock
+.venv/bin/python -m practice.examples vectors</code></pre>
+<p>Expected lines: <code>0.707</code> and <code>0.0</code>. The completed <a href="../practice/examples.py">practice/examples.py</a> offers small fragments; <a href="../practice/__init__.py">__init__.py</a> marks their importable package. <code>-m</code> asks Python to find the module from this starting directory. If imports fail, check <code>pwd</code> and the interpreter before editing code. A package download failure is infrastructure, not a wrong exercise answer.</p>
+<p><a href="../.gitignore">.gitignore</a> excludes the generated environment, caches, runtime stores and secrets. These contain interpreter/dependency files or reproducible output: use them, do not study each file. <a href="../assets/course.css">assets/course.css</a> imports the existing backend visual style. The shared print helper opens answer disclosures on paper; neither changes progress.</p>
+<h2>Baseline probes</h2>
+<p>Fill <a href="../weekly-logs/week-08.md">weekly-logs/week-08.md</a>: What is the difference between a JSON string and a dictionary? What does <code>return</code> give a caller? Why can a valid HTTP response still contain a wrong answer? State uncertainty explicitly.</p>
+<details><summary>Hint</summary><p>Separate wire text, an in-memory value, function control flow and factual correctness.</p></details>
+<details><summary>Explained answer</summary><p><code>'{"x":1}'</code> is text; <code>{"x":1}</code> is a dictionary accessed by key. JSON parsing converts between them. A return hands a value back, unlike printing to the terminal. HTTP 200 says a request was handled, not that its content is supported by evidence.</p></details>
+<p>If these block you, read only the <a href="../../../python/week-03/lessons/0003-functions-and-tests.html">functions/tests bridge</a>, <a href="../../../python/week-03/lessons/0005-models-and-validation.html">validation lesson</a> or <a href="../../../backend/week-04/lessons/0003-http-message.html">HTTP message lesson</a> needed, then retry. Independent variation: explain why printing an answer inside a function may leave its caller with <code>None</code>.</p>
+
+<p class="source">Primary reading: <a href="https://docs.pydantic.dev/latest/concepts/models/">pydantic official documentation</a>. Check the mechanism, then return to your own example.</p>
+<aside class="callout">Pause and record your prediction, observed result, explanation, help used and next step in <a href="../weekly-logs/week-08.md">your weekly log</a>. Ask the tutor a follow-up question whenever a step is unclear; include your starting directory and exact result.</aside>
+<nav class="page-nav" aria-label="Lesson sequence"><a href="../index.html">← Previous</a><a href="0002-ingestion-bridge.html">Next →</a></nav></main></body></html>

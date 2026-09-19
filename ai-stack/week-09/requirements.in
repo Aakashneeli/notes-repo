@@ -1,0 +1,8 @@
+# Core workflow checks: no model weights, GPU runtime or paid API required.
+langgraph>=1.0,<2
+langsmith>=0.4,<1
+fastapi>=0.115,<1
+pydantic>=2.10,<3
+httpx>=0.28,<1
+pytest>=8,<10
+uvicorn>=0.34,<1
