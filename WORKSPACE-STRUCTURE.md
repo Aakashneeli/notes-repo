@@ -18,6 +18,10 @@ Current locations:
 
 - `ai-stack/week-09/`: source Week 9 — Agents (LangGraph, LangSmith, Tool Use, Hugging Face, Ollama, llama.cpp, and vLLM Concepts).
 
+- `system-design/week-10/`: source Week 10 — Design (System Design, LLD/HLD, Observability, Performance, Reliability, and Security Review).
+
+- `cloud-devops/week-11/`: source Week 11 — Cloud (AWS Deployment, CI/CD, Secrets, Cloud Logs, Runbooks, and Cost Control).
+
 Each topic may have a short README and HTML index linking its weeks. Each weekly root uses:
 
 ```text

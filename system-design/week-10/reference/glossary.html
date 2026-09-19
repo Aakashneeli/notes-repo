@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Working vocabulary · Week 10</title><link rel="stylesheet" href="../assets/course.css"></head><body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course navigation"><a href="../index.html">Study desk</a></nav><p class="eyebrow">Printable reference</p><h1>Working vocabulary</h1><dl><dt>LLD / HLD</dt><dd>Code-level responsibility design / running-system design.</dd>
+<dt>Interface / protocol</dt><dd>The operations a caller needs; Python Protocol expresses a structural type contract without runtime input validation.</dd>
+<dt>Dependency injection</dt><dd>Passing a dependency into a function/object so a caller chooses the implementation.</dd>
+<dt>Service / repository</dt><dd>Workflow policy / storage-facing operations. Boundaries hide different reasons for change.</dd>
+<dt>Container (C4)</dt><dd>A deployable application or data store; not necessarily a Docker container.</dd>
+<dt>Trust boundary</dt><dd>A change in authority or trust when data/actions cross components or parties.</dd>
+<dt>Timeout / deadline</dt><dd>A wait limit for an operation / the total time budget remaining for a request.</dd>
+<dt>Retry / backoff / jitter</dt><dd>A new attempt / increasing delay / randomized delay to spread attempts.</dd>
+<dt>Idempotency</dt><dd>Repeating an operation has the same intended effect; it does not mean executing exactly once.</dd>
+<dt>Circuit breaker</dt><dd>A failure-sensitive gate with closed, open and limited-probe recovery states.</dd>
+<dt>Dead job</dt><dd>Work held for investigation after permanent failure or exhausted retries.</dd>
+<dt>Log / metric / trace</dt><dd>An event record / an aggregate over observations / linked steps of one operation.</dd>
+<dt>Request ID</dt><dd>A correlation identifier, never proof of identity or permission.</dd>
+<dt>Latency / throughput</dt><dd>Elapsed time per request / completed requests per unit time.</dd>
+<dt>p95</dt><dd>A sample's 95th percentile under a stated convention; not a worst-case guarantee.</dd>
+<dt>Cache-aside / TTL</dt><dd>Read cache, then source on miss / expiration duration; neither grants authorization.</dd>
+<dt>Rate limit</dt><dd>A policy bounding how much work an actor can request in a time window.</dd>
+<dt>Atomic operation</dt><dd>A change that cannot be observed partially within its stated system boundary.</dd>
+<dt>Index / cursor</dt><dd>A database access structure / a continuation position for a stable paginated ordering.</dd>
+<dt>Batching / async I/O</dt><dd>Grouping work to amortize overhead / yielding while I/O waits so other tasks can progress.</dd>
+<dt>Prompt injection / retrieval poisoning</dt><dd>Untrusted instructions steering a model / malicious or unreliable source content corrupting retrieval-based answers.</dd>
+<dt>Token / cost estimate</dt><dd>A model-specific text unit / usage times explicitly identified rates; unknown usage is not zero.</dd>
+<dt>ADR / runbook</dt><dd>A consequential choice with reasons and tradeoffs / a symptom-driven operational procedure.</dd>
+<dt>Fixture / mock / live evidence</dt><dd>Supplied controlled prerequisite data/behavior / substituted dependency / an observation against the actual integration.</dd></dl><p><a href="../lessons/0001-start.html">Start lesson</a> · <a href="review-card.html">Review card</a></p></main></body></html>

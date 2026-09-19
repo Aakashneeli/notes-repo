@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Make CI earn the right to release</title><link rel="stylesheet" href="../assets/course.css"></head><body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course navigation"><a href="../index.html">Week 11 desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/operations.html">Reference</a></nav><p class="eyebrow">Week 11 · 08</p><h1>Make CI earn the right to release</h1><p class="lede">Write a test/build workflow and explain the separate deployment identity boundary.</p>
+<p>Continuous integration runs checks on a proposed change. Delivery produces a releasable artifact; deployment changes the running service. A green syntax check cannot prove the candidate is healthy in its destination. This week requires lint/test/build plus a documented deploy step; automatic cloud deployment is not necessary.</p>
+<h2>Trace a small job</h2>
+<pre><code>jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cloud-devops/week-11
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.lock</code></pre>
+<p>YAML indentation makes a mapping nested; <code>-</code> starts a sequence item. Checkout obtains source; setup-python chooses an interpreter. The run default changes shell commands' directories, not uses actions' input paths. This fragment is a worked example, not a complete project workflow. These major tags illustrate syntax; before activating a workflow review the action's release and pin a reviewed full commit SHA for stronger supply-chain control.</p>
+<p>Edit the inactive <a href="../projects/deployment/ci/workflow.yml">workflow.yml</a>. Keep push/pull_request triggers and contents: read. Add install, Ruff, fixture tests, release tests and Docker build. Gate publishing/deployment on successful checks; untrusted pull requests must not receive cloud credentials. Do not run cloud deployment under pull_request_target with untrusted checked-out code. Include a manual deployment description in runbook.md naming the exact tested commit and artifact.</p>
+<pre><code>cd /home/an10/code/notes-repo/cloud-devops/week-11
+.venv/bin/python -m ruff check projects/deployment practice
+.venv/bin/python -m pytest projects/deployment/fixture projects/deployment/tests -q
+docker build -f projects/deployment/Dockerfile -t week11-api:ci .</code></pre>
+<p>Before lesson 11 the release tests intentionally fail; keep that gate visible. Lint/build are separate checks: one can pass while another fails. Fix errors in your source, not by deleting checks. Inspect <code>git diff -- projects/deployment</code> from the week root and explain changed files. Record the local result in weekly-logs/week-11.md.</p>
+<h2>ECR push and deployment are distinct</h2>
+<p>With learner-owned AWS/GitHub setup, an optional trusted release job can exchange GitHub's OIDC token for an AWS role session. The trust policy must match <code>aud=sts.amazonaws.com</code> and a specific repository/branch or protected environment subject. <code>id-token: write</code> permits requesting the token; it does not grant AWS permissions. The assumed role still needs narrowly scoped ECR push permissions. The EC2 host needs only pull and log permissions. Never distribute a root or long-lived deployment key to a PR job.</p>
+<pre><code># LEARNER LIVE ACTION, after identity and repository are configured:
+aws ecr get-login-password --region "${AWS_REGION:?}" |
+  docker login --username AWS --password-stdin "${WEEK11_REGISTRY:?}"
+docker tag week11-api:v1 "${WEEK11_REGISTRY:?}/week11-api:${WEEK11_RELEASE:?}"
+docker push "${WEEK11_REGISTRY:?}/week11-api:${WEEK11_RELEASE:?}"</code></pre>
+<p>WEEK11_REGISTRY is the account/region registry hostname; WEEK11_RELEASE identifies the tested commit. ECR must have the repository (or an explicitly configured creation template). Record the resulting digest; avoid deploying an ambiguous mutable latest tag. The EC2 lesson also offers image transfer without registry setup.</p>
+<p><strong>Learner activation:</strong> only after the draft passes, copy it to the repository's .github/workflows/week11.yml, review existing workflows and trigger it through your normal GitHub process. This tutor has not installed or run a hosted workflow. Record run URL, commit and result separately from local checks.</p>
+<details><summary>Hint and debugging feedback</summary><p>“requirements.lock not found” often means a wrong working directory. “Not authorized to assume role” points to the token/trust relationship; “denied pushing image” after successful role assumption points to permissions/resource scope. They are different boundaries.</p></details>
+<p>Variation: make a fixture assertion fail on a scratch branch; predict whether image publishing can still run. Add one source-reading note about needs/permissions, then continue to the host rehearsal.</p><aside class="source"><h2>Primary sources</h2><ul><li><a href="https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax">Actions workflow syntax</a> — Triggers, permissions, job order and working directories.</li><li><a href="https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws">GitHub OIDC to AWS</a> — Temporary cloud identity and audience/subject restrictions.</li><li><a href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html">Push images to ECR</a> — Registry authentication, tagging and pushing.</li></ul></aside><p>Ask the tutor a follow-up whenever a trace or result is unclear. Share your prediction and redacted observation.</p><nav class="page-nav" aria-label="Lesson sequence"><a href="0007-storage.html">← Previous</a><a href="0009-deploy.html">Next →</a></nav></main></body></html>

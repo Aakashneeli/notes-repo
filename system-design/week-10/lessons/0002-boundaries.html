@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Give a module one reason to change · Week 10</title><link rel="stylesheet" href="../assets/course.css"></head><body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course navigation"><a href="../index.html">Study desk</a></nav><p class="eyebrow">Week 10 / Lesson 02</p><h1>Give a module one reason to change</h1><p class="lede">Inject a small interface and explain who owns policy versus storage.</p>
+
+<p>Low-level design (LLD) is about responsibilities inside code. An HTTP handler translates requests and responses; a service decides the workflow; a repository hides storage operations. A service called <code>ask</code> should not need to know a database's connection string to decide what to do with empty retrieval.</p>
+<h2>Follow one injected dependency</h2>
+<pre><code>class Catalog(Protocol):
+    def title(self, item_id: str) -> str: ...
+
+def label(item_id: str, catalog: Catalog) -> str:
+    return catalog.title(item_id).upper()</code></pre>
+<p><code>Protocol</code> describes the methods callers need. The colon after a parameter is a type hint, and <code>-&gt; str</code> describes its result. The ellipsis describes an interface without implementing it. These hints do not validate network data at runtime. <code>catalog</code> is passed in by the caller: that is dependency injection. No special framework is needed.</p>
+<p>Read <a href="../practice/examples.py">examples.py</a>. <code>MemoryCatalog.title("book-1")</code> looks up <code>"Field guide"</code>; <code>label</code> turns it into <code>"FIELD GUIDE"</code>. The caller selects storage; the service selects presentation. A fake with the same method can supply a title during tests. An unknown key raises <code>KeyError</code>; replacing it with a blank title would hide a real failure.</p>
+<pre><code># Start: system-design/week-10
+python practice/examples.py</code></pre>
+<p>Expect <code>FIELD GUIDE</code>, one JSON timeout event with a variable positive duration, then <code>available attempts 2</code>. Read the boundary part now; Lessons 5 and 7 explain the other outputs. Leave this completed teaching example unchanged.</p>
+<h2>Guided practice</h2>
+<p>Edit only <code>label</code> in <a href="../practice/exercises.py">exercises.py</a>. It must use the supplied object's <code>title</code> method, not create <code>MemoryCatalog</code> inside itself. From the weekly root run:</p>
+<pre><code>python -m unittest discover -s practice -p test_exercises.py -k boundary -v</code></pre>
+<p>The supplied <a href="../practice/test_exercises.py">test</a> injects a different title and ID. It should pass after this one function is implemented; other functions remain unfinished. Record the command, result and help used in your weekly log, then attempt the variation.</p>
+<details><summary>Hint 1 — locate the decision</summary><p>Storage gives you a title. Uppercasing belongs after that call. Return the transformed value.</p></details>
+<details><summary>Hint 2 and explained beginner answer</summary><pre><code>return catalog.title(item_id).upper()</code></pre><p>First evaluate the method call; then call <code>upper</code> on the returned string. This does not uppercase the identifier.</p></details>
+<h2>Boundaries are a tradeoff</h2>
+<p>Too many tiny wrappers force you to chase a simple decision across files. Too few boundaries mix authentication, retrieval, provider retries and logging into one function. Prefer an interface that hides a real source of change: a retrieval port taking a trusted tenant and query, returning authorized hits. A repository must not treat a caller-supplied tenant as authenticated identity. Service rules determine what the user may do; query filters enforce the resulting scope close to the data.</p>
+<p>Variation: sketch a <code>search(query, tenant, limit)</code> interface in your log. Specify returned fields and what a timeout means. Explain how a fake helps test “no hits means no model call,” and what it cannot prove about a real vector database. Add the code entrypoint, call chain and one uncertainty to <a href="../codebase-reading/reading-log.md">the reading log</a>. Continue to Lesson 3 to locate these responsibilities in the larger system.</p>
+
+<section aria-labelledby="materials"><h2 id="materials">Files at this step</h2><p>From the weekly root, use these exact relative paths. Folders group the following roles; you do not need to memorize the full tree. Supplied tests/examples are infrastructure; implementation files and evidence notes belong to you.</p><ul><li><a href="../practice/examples.py"><code>practice/examples.py</code></a> — <strong>Read and run; leave unchanged.</strong> Completed catalog/timeout/retry examples; separate from main project.</li>
+<li><a href="../practice/exercises.py"><code>practice/exercises.py</code></a> — <strong>Edit incrementally.</strong> Learner boundary/retry/error-rate/cache exercises in Lessons 2,5,7,9.</li>
+<li><a href="../practice/test_exercises.py"><code>practice/test_exercises.py</code></a> — <strong>Read and run; preserve assertions.</strong> Four beginner checks; -k selects the current exercise.</li>
+<li><a href="../codebase-reading/reading-log.md"><code>codebase-reading/reading-log.md</code></a> — <strong>Append.</strong> One focused docs/code question with path/revision and evidence.</li></ul></section>
+<p class="source">Primary reading: <a href="https://docs.python.org/3/library/typing.html#typing.Protocol">official source for this lesson</a>. Also see <a href="../RESOURCES.md">annotated sources</a> and <a href="../reference/glossary.html">the glossary</a>. Ask the tutor a follow-up with your prediction, attempt and observed result whenever a step is unclear.</p>
+<div class="page-nav"><a href="0001-start.html">← Previous lesson</a><a href="0003-system-views.html">Next lesson →</a></div></main></body></html>

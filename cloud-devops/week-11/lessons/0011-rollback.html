@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Promote only a verified release</title><link rel="stylesheet" href="../assets/course.css"></head><body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course navigation"><a href="../index.html">Week 11 desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/operations.html">Reference</a></nav><p class="eyebrow">Week 11 · 11</p><h1>Promote only a verified release</h1><p class="lede">Implement a release gate and recover from a failed candidate without confusing code and data rollback.</p>
+<p>A deploy command can succeed while the application is wrong. Promotion means choosing a candidate for normal traffic. Rollback selects the previous known-good image <em>and compatible configuration</em>. Tags can move, so keep the image digest or an explicitly recorded local image ID as evidence.</p>
+<h2>A gate with two distinct checks</h2>
+<p>A health response of 200 from release old is not proof of release new. A ready field equal to the number 1 is not the JSON boolean true required by this contract. Python considers <code>1 == True</code> equal; <code>ready is True</code> tests the exact boolean object. The gate needs status 200, exact True readiness, matching nonempty release strings.</p>
+<p>At the week root edit <a href="../projects/deployment/release.py">release.py</a>. It is a pure decision function; no hidden script deploys for you. Read the supplied <a href="../projects/deployment/tests/test_release.py">test_release.py</a>; its parameterized table calls the same function on different cases. Then run:</p>
+<pre><code>cd /home/an10/code/notes-repo/cloud-devops/week-11
+.venv/bin/python -m pytest projects/deployment/tests -q</code></pre>
+<details><summary>First hint</summary><p>Write four required conditions in words, then combine them. A single false condition must block promotion. Do not treat the status as a truthy integer.</p></details>
+<details><summary>Second hint</summary><p>Separate “is the expected release nonempty?” from “do the strings match?” Otherwise two empty strings would pass. Add an independent test before implementing the whole expression.</p></details>
+<p>The assessed implementation is yours. Add a test for a new failure or input boundary in the same tests directory; explain what mistake it catches. A gate tested in isolation does not prove your runbook actually uses it.</p>
+<h2 id="rehearsal">Break a local candidate safely</h2>
+<p>Start the good lesson 4 container on port 8000. In another terminal at the week root, run a candidate on 8001 with a public dummy environment and a known injected failure:</p>
+<pre><code>docker run --rm --name week11-candidate -p 127.0.0.1:8001:8000 \
+  --env-file projects/deployment/.env.example \
+  -e RELEASE=week11-bad -e FAIL_MODE=dependency week11-api:v1</code></pre>
+<p>In a third terminal at the week root:</p>
+<pre><code>curl -i http://127.0.0.1:8001/health
+curl -i http://127.0.0.1:8001/ready
+curl -i -H 'X-API-Key: local-rehearsal-only' http://127.0.0.1:8001/message
+curl -i http://127.0.0.1:8000/ready</code></pre>
+<p>Predict then observe: 200, 503, 500, and the old release still ready. The bad image here is the same code with faulty config; code replacement alone cannot repair that. Stop only the candidate with Ctrl-C. Record the observations in <a href="../projects/deployment/rollback.md">rollback.md</a>. Recreate a healthy candidate with RELEASE=week11-v2 and empty FAIL_MODE, verify all three route types plus unauthorized access, then remove it when finished.</p>
+<h2>A concrete single-host switch</h2>
+<details><summary>Command pattern — learner live action after candidate checks</summary><p>Start on the host in <code>/home/ubuntu/week11-runtime</code>. Before switching, create a separate mode-600 <code>.env.candidate</code> in your editor, validate it on port 8001, and set WEEK11_CANDIDATE_IMAGE to the exact tested digest/local image ID. Confirm that the archive name below is unused with <code>sudo docker ps -a</code>. The pattern accepts a brief outage.</p><pre><code>sudo docker stop week11-api
+sudo docker rename week11-api week11-previous-v1
+sudo docker run -d --name week11-api --restart unless-stopped \
+  -p 127.0.0.1:8000:8000 --env-file .env.candidate \
+  --log-driver local --log-opt max-size=10m --log-opt max-file=3 \
+  "${WEEK11_CANDIDATE_IMAGE:?}"
+curl -i http://127.0.0.1:8000/health
+curl -i http://127.0.0.1:8000/ready</code></pre><p>Use lesson 9's private authenticated request too, then repeat through the tunnel. If the new container fails, remove only that new container and restore the archive:</p><pre><code>sudo docker stop week11-api
+sudo docker rm week11-api
+sudo docker rename week11-previous-v1 week11-api
+sudo docker start week11-api
+curl -i http://127.0.0.1:8000/health
+curl -i http://127.0.0.1:8000/ready</code></pre><p>If creation failed before week11-api existed, skip stop/rm and restore the archive. Record actual results in rollback.md. This pattern uses local logs; if cloud logging was selected, preserve the verified lesson 10 options and check delivery too. Never overwrite the old configuration with the faulty candidate's file. See <a href="https://docs.docker.com/reference/cli/docker/container/run/">Docker run</a> and <a href="https://docs.docker.com/reference/cli/docker/container/rename/">Docker rename</a>.</p></details>
+<p>For a real release, keep the old image and config version. Verify a candidate on port 8001 first, using the real key privately. Our simple direct port mapping cannot atomically switch traffic; accept a short maintenance window. Stop the old container, rename it to a unique archived name, and create the new week11-api on port 8000 using the candidate's verified image and config. Immediately run health, readiness, authorized and unauthorized checks through the actual tunnel. Write exact commands for your chosen digest in rollback.md before attempting it.</p>
+<p>If the new release fails: stop/remove only that new container, rename the archived previous container back to week11-api, start it, and repeat the endpoint checks. Its original creation-time environment is retained. Never delete the old image/config before recovery is proven. Existing database migrations may make old code incompatible; a code rollback cannot un-delete rows. For a real data app, plan backward-compatible schema changes or an independently verified restore/forward-fix strategy.</p>
+<p>Independent variation: candidate readiness is good but the returned release is old. Explain why the gate must reject it. Update CI's release tests from lesson 8 and rerun the local pipeline. Next: prove that stopping work also stops avoidable cost.</p><aside class="source"><h2>Primary sources</h2><ul><li><a href="https://docs.docker.com/build/building/best-practices/">Docker image practices</a> — Small build contexts, image construction and deliberate dependency updates.</li><li><a href="https://fastapi.tiangolo.com/deployment/docker/">FastAPI containers</a> — Container process, bind address and deployment concerns.</li></ul></aside><p>Ask the tutor a follow-up whenever a trace or result is unclear. Share your prediction and redacted observation.</p><nav class="page-nav" aria-label="Lesson sequence"><a href="0010-logs.html">← Previous</a><a href="0012-shutdown.html">Next →</a></nav></main></body></html>

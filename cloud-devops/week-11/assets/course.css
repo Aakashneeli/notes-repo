@@ -1,0 +1,4 @@
+@import url("../../../backend/week-04/assets/course.css");
+.skip{position:absolute;left:-10000px}.skip:focus{position:static}
+.status{border:1px solid var(--accent);padding:12px 18px}
+@media print{details{break-inside:auto}pre{white-space:pre-wrap}}

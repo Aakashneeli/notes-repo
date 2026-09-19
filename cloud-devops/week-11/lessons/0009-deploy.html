@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rehearse the EC2 release</title><link rel="stylesheet" href="../assets/course.css"></head><body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course navigation"><a href="../index.html">Week 11 desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/operations.html">Reference</a></nav><p class="eyebrow">Week 11 · 09</p><h1>Rehearse the EC2 release</h1><p class="lede">Follow a concrete host deployment procedure and record a real private endpoint only when observed.</p>
+<p>This is a learner-operated live lab. It needs an AWS account with permitted billing/IAM/EC2 actions, SSH, Docker, network downloads and an estimate below the budget. No resources are created by opening this lesson. If those prerequisites are unavailable, rehearse locally and leave the live endpoint pending. The runbook must distinguish both states.</p>
+<h2 id="host">Choose and prepare one host</h2>
+<p>Before launch, complete cost-plan.md and access-plan.md. In the EC2 console select the chosen region; launch an Ubuntu Server 24.04 LTS host of a costed x86_64 instance type, with matching image architecture, only the needed gp3 disk, a key pair you control, and an EC2 role for logging (lesson 10) and optional ECR pull. Require IMDSv2. Select a public subnet with an Internet Gateway route and public IPv4 for this SSH path; allow inbound TCP 22 only from your public IP /32, no 8000. Record instance ID, region, type, volume and SG IDs for cleanup. Choose deliberate outbound access for package/registry/log endpoints; note any broad temporary egress.</p>
+<p>Verify the host fingerprint via the EC2 system log or another trusted AWS channel before accepting it in SSH. On your laptop, with the PEM file saved outside Git:</p>
+<pre><code># Laptop; replace these paths/addresses with the learner's selected host.
+chmod 400 /path/to/week11.pem
+ssh -i /path/to/week11.pem ubuntu@YOUR_EC2_ADDRESS</code></pre>
+<p>On the host, start in the ubuntu user's home directory. Follow the linked official Ubuntu Docker apt-repository installation: install ca-certificates/curl, add Docker's signed key and apt source for noble/your architecture, apt update, then install docker-ce, docker-ce-cli, containerd.io, docker-buildx-plugin and docker-compose-plugin. These version-sensitive repository commands belong to that official installation page. Verify <code>sudo systemctl status docker</code> and <code>sudo docker version</code> show an active daemon; record versions in runbook.md. Do not use a convenience script without understanding its host changes.</p>
+<h2 id="transfer">Transfer the image you tested</h2>
+<p>For the smallest path, transfer an image archive over SSH; no ECR is required. On the laptop at the week root, after lesson 4 passes:</p>
+<pre><code>cd /home/an10/code/notes-repo/cloud-devops/week-11
+mkdir -p generated
+docker save -o generated/week11-v1.tar week11-api:v1
+scp -i /path/to/week11.pem generated/week11-v1.tar ubuntu@YOUR_EC2_ADDRESS:week11-v1.tar</code></pre>
+<p><code>generated/</code> contains ignored build outputs, not learner source. Docker save preserves the image; scp transfers it, not credentials. A local ARM image on an x86 host fails with an execution-format error: either use matching hardware or deliberately build/test the target platform first. Do not call a cross-build tested just because it completed.</p>
+<p>On the EC2 host, in the ubuntu home directory:</p>
+<pre><code>sudo docker load -i week11-v1.tar
+install -d -m 700 week11-runtime
+cd week11-runtime
+umask 077
+nano .env
+chmod 600 .env</code></pre>
+<p>In the host editor enter API_KEY with a new secret, RELEASE=week11-v1 and an empty FAIL_MODE. Do not copy real values into the repository. Host directory week11-runtime is operational state, separate from the local learning workspace. Then, still on the host in that directory:</p>
+<pre><code>sudo docker run -d --name week11-api --restart unless-stopped \
+  -p 127.0.0.1:8000:8000 --env-file .env \
+  --log-driver local --log-opt max-size=10m --log-opt max-file=3 \
+  week11-api:v1
+curl -i http://127.0.0.1:8000/health
+curl -i http://127.0.0.1:8000/ready
+sudo docker logs --tail 20 week11-api</code></pre>
+<p>This first release uses bounded local logs; lesson 10 teaches cloud delivery. A restart policy restarts a failed process, not a process that merely answers 503. Expect release week11-v1 and ready 200. If either fails, use logs before exposing access.</p>
+<h2 id="endpoint">Connect from the laptop</h2>
+<pre><code># Laptop terminal; keep this SSH tunnel open.
+ssh -i /path/to/week11.pem -N -L 18000:127.0.0.1:8000 ubuntu@YOUR_EC2_ADDRESS
+# Another laptop terminal:
+curl -i http://127.0.0.1:18000/health
+curl -i http://127.0.0.1:18000/ready
+curl -i http://127.0.0.1:18000/message</code></pre>
+<p>Expect 200, 200, 401. For a real authenticated request, use a local API client with a private header value, or an editor-created curl config file with mode 600 outside Git, containing <code>header = "X-API-Key: YOUR_REAL_VALUE"</code>; run <code>curl --config /path/to/private-curl.conf -i http://127.0.0.1:18000/message</code>. Do not paste the key in shell history or the evidence log. Expect 200 with the correct release.</p>
+<p>Now fill <a href="../projects/deployment/endpoint.md">endpoint.md</a>: instance/region/date, tunnel setup, URL, release, statuses and known limits. This is a documented private endpoint only if actually observed. Update runbook.md with your exact paths and diagram. If using ECR instead, authenticate on the host using its pull role, pull the recorded digest, and substitute that digest reference for the local tag.</p>
+<details><summary>Failure and variation</summary><p>A successful docker run prints a container ID, not proof of readiness. Close the SSH tunnel: laptop requests should fail while the host's local health remains good. Explain why redeploying the application would be the wrong repair.</p></details>
+<p>Save redacted evidence, then proceed to cloud logs. Do not leave a chargeable host running past your planned window just to finish reading.</p><aside class="source"><h2>Primary sources</h2><ul><li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html">EC2 getting started</a> — Launch settings, instance state and connection prerequisites.</li><li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-to-linux-instance.html">EC2 SSH access</a> — Key and SSH connection prerequisites.</li><li><a href="https://docs.docker.com/engine/install/ubuntu/">Docker on Ubuntu</a> — Official repository installation for the selected Ubuntu host.</li></ul></aside><p>Ask the tutor a follow-up whenever a trace or result is unclear. Share your prediction and redacted observation.</p><nav class="page-nav" aria-label="Lesson sequence"><a href="0008-ci.html">← Previous</a><a href="0010-logs.html">Next →</a></nav></main></body></html>

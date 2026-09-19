@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Draw the private traffic path</title><link rel="stylesheet" href="../assets/course.css"></head><body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course navigation"><a href="../index.html">Week 11 desk</a><a href="../plan/file-map.html">File map</a><a href="../reference/operations.html">Reference</a></nav><p class="eyebrow">Week 11 · 05</p><h1>Draw the private traffic path</h1><p class="lede">Locate a failed request at the network, host or application boundary.</p>
+<p>The affordable teaching path is one EC2 host reached through SSH, with the API published only on host loopback. “Private endpoint” here means access-controlled through a tunnel; the host may still have a public IP for SSH. It is not an AWS PrivateLink endpoint or a VPC-private subnet design.</p>
+<h2>Follow one byte</h2>
+<pre><code>laptop curl 127.0.0.1:18000
+  → laptop SSH tunnel
+  → internet → EC2 public IP:22 (SG permits your IP only)
+  → SSH server → EC2 loopback:8000
+  → Docker port mapping → container:8000
+  → Uvicorn → FastAPI route</code></pre>
+<p>A VPC is the network boundary; a subnet owns a range of addresses. For this simple public-host path, the subnet route table needs an Internet Gateway route, and the instance needs a public address. A route says where to send packets; the security group says which traffic is allowed. Network ACLs and host firewalls can also affect delivery. We use the default network ACL rather than introducing another lab configuration.</p>
+<p>SSH encrypts the tunnel. The HTTP connection inside it is not a public HTTPS service. No inbound 8000 rule is needed. A true public API would instead need a public HTTPS entry point, certificate/domain handling, authentication and appropriate proxy/host controls; do not open 8000 globally as a substitute. This week's source permits a documented private endpoint.</p>
+<h2>Predict failures before changing rules</h2>
+<p>If SSH times out, inspect instance state/address, source-IP rule and route. If SSH says permission denied, the TCP connection reached SSH; check username/key. If the tunnel connects but curl is refused, inspect Docker publishing and server startup. If curl returns 401, the network worked; inspect authentication. If it returns 500, use the request ID and logs.</p>
+<p>At the week root edit <a href="../projects/deployment/architecture.mmd">architecture.mmd</a>, a learner Mermaid text diagram. Replace the TODO nodes with the actual path above, region/VPC/subnet/SG boundaries, host/container ports, registry, role and logs. Add storage only when selected. View it in a Mermaid-capable Markdown editor; also write the same flow in runbook.md so the evidence remains understandable without a renderer.</p>
+<h2>Guided observation without AWS</h2>
+<p>Repeat lesson 4's container run and curl. Inspect its publishing:</p>
+<pre><code>cd /home/an10/code/notes-repo/cloud-devops/week-11
+docker port week11-local
+docker logs --tail 20 week11-local</code></pre>
+<p>Expect a loopback mapping and safe request events. No AWS result can be inferred. In access-plan.md finish the port/source table; in weekly-logs/week-11.md write which failure layer a 401 and a timeout implicate.</p>
+<details><summary>Hint and feedback</summary><p>A timeout supplies no HTTP response, so start below the route handler. A 401 proves some HTTP server answered, but check the release too: it could be the wrong service on that port.</p></details>
+<p>Independent variation: explain what changes if your home public IP changes. Update the SSH source rule, not the API implementation. Next: decide how secrets enter a process without entering the repository.</p><aside class="source"><h2>Primary sources</h2><ul><li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html">EC2 security groups</a> — Allowed traffic, stateful replies and instance network boundaries.</li><li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-to-linux-instance.html">EC2 SSH access</a> — Key and SSH connection prerequisites.</li></ul></aside><p>Ask the tutor a follow-up whenever a trace or result is unclear. Share your prediction and redacted observation.</p><nav class="page-nav" aria-label="Lesson sequence"><a href="0004-image.html">← Previous</a><a href="0006-secrets.html">Next →</a></nav></main></body></html>

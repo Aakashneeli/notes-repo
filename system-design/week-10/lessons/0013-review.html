@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prove ownership after the hints fade · Week 10</title><link rel="stylesheet" href="../assets/course.css"></head><body><a class="skip" href="#main">Skip to content</a><main id="main"><nav aria-label="Course navigation"><a href="../index.html">Study desk</a></nav><p class="eyebrow">Week 10 / Lesson 13</p><h1>Prove ownership after the hints fade</h1><p class="lede">Complete an independent implementation, debugging and explain-back review.</p>
+
+<p>Author validation proves the teaching files behave as described. It does not prove you can design, debug or explain the system. Your completion evidence must come from independent attempts, including a change that was not shown in a worked example.</p>
+<h2>Run the local gates</h2>
+<pre><code># Start: system-design/week-10
+python -m unittest discover -s practice -p test_exercises.py -v
+python -m unittest discover -s projects/architecture-review/tests -v
+python maintenance/validate.py</code></pre>
+<p>The first two require your implementations. The last checks supplied links, map entries, syntax, diagram structure and completed examples; it does not certify your decisions. Read <a href="../VALIDATION.md">VALIDATION</a> to separate tutor checks from learner work. Do not remove meaningful assertions to turn the suite green.</p>
+<h2>Exercise a failure</h2>
+<p>In your own implementation, temporarily remove tenant/version separation from a cache-key experiment or force all observed requests to share one ID. Predict which test should fail, run it, explain the failure, then restore the correct implementation using your editor. Record actual output in <a href="../weekly-logs/mistakes.md">mistakes.md</a>. If the test stays green, improve it before claiming coverage. Do not introduce a fault into the supplied instructor examples.</p>
+<h2>Four source explain-backs</h2>
+<ol><li>What happens if the vector DB is slow or unavailable? Trace the deadline, response, safe fallback, logging and recovery; distinguish absence of evidence from empty retrieval.</li><li>What should be retried and what should not? Include a read timeout, authorization failure and a side effect whose response was lost.</li><li>Where are the trust boundaries? Use your data-flow diagram to locate uploaded text, authenticated identity, provider exports, tool execution and telemetry.</li><li>What is the first thing you inspect when production latency spikes? Begin with scope/time window, latency/error/traffic metrics, then one correlated trace and a falsifiable hypothesis.</li></ol>
+<p>Answer without reading these lessons, then check against your evidence and <a href="../reference/review-card.html">the review card</a>. Record assistance honestly in <code>weekly-logs/week-10.md</code>. Use <a href="../templates/review.md">the review template</a> for another dated attempt; append to the log rather than replacing the previous one.</p>
+<h2>Commit a reviewable slice locally</h2>
+<p>From the weekly root, inspect status and the specific files you changed. Stage only your completed instrumentation file, its related evidence note and any new regression test; example:</p>
+<pre><code>git add projects/architecture-review/instrumentation.py projects/architecture-review/observability.md
+git diff --cached --stat
+git diff --cached
+git commit -m "Add request-correlated AI event logging"</code></pre>
+<p>These are learner actions; the tutor does not commit for you. If other work is already staged, inspect it and choose your intended scope before committing. A commit is evidence of a change, not mastery; record its hash and explain what it proves. Nothing here pushes or publishes.</p>
+<h2>Return after a delay</h2>
+<p>At your next session, recall retry rules and redraw one view before opening notes. Two or three days later, use a new tenant/corpus version and one different failure to test your design. Around a week later, explain the whole ask path and defend one ADR to a skeptical reviewer. Flexible pacing is fine; the delay and reduced hints matter more than a calendar streak.</p>
+<p>Use <a href="../plan/assessment.md">assessment</a> as the completion gate, then update <code>plan/progress.md</code> with links to your own outputs. Mark real-backend integration pending until demonstrated. The tutor adds a numbered learning record only when your attempt establishes a nontrivial insight or corrected misconception; no empty records folder is required.</p>
+<p>If you want practitioner feedback, the optional community in <code>RESOURCES.md</code> is a learner choice. Share a sanitized question and diagram only after reviewing what leaves your machine; no posting is performed for you. Ask the tutor to examine your reasoning, test results or one failed prediction.</p>
+
+<section aria-labelledby="materials"><h2 id="materials">Files at this step</h2><p>From the weekly root, use these exact relative paths. Folders group the following roles; you do not need to memorize the full tree. Supplied tests/examples are infrastructure; implementation files and evidence notes belong to you.</p><ul><li><a href="../plan/assessment.md"><code>plan/assessment.md</code></a> — <strong>Read and demonstrate.</strong> Independent completion criteria and integration gates.</li>
+<li><a href="../weekly-logs/mistakes.md"><code>weekly-logs/mistakes.md</code></a> — <strong>Append.</strong> Actual failures, diagnosis and regression checks.</li>
+<li><a href="../templates/review.md"><code>templates/review.md</code></a> — <strong>Read/copy headings; leave template.</strong> Reusable delayed-retrieval record for the weekly log.</li>
+<li><a href="../reference/review-card.html"><code>reference/review-card.html</code></a> — <strong>Read after recall.</strong> Compact failure/security/performance recall aid.</li>
+<li><a href="../maintenance/validate.py"><code>maintenance/validate.py</code></a> — <strong>Run; tutor maintains.</strong> Static navigation/map/diagram/syntax and instructor checks; not assessment.</li>
+<li><a href="../maintenance/test_infrastructure.py"><code>maintenance/test_infrastructure.py</code></a> — <strong>Read/run; tutor maintains.</strong> Completed examples/harness tests plus event-check sensitivity; no project solution.</li>
+<li><a href="../maintenance/browser-check.cjs"><code>maintenance/browser-check.cjs</code></a> — <strong>Optional author run.</strong> Headless Chromium layout check; requires externally available Playwright.</li>
+<li><a href="../maintenance/author-results.md"><code>maintenance/author-results.md</code></a> — <strong>Read; tutor-maintained.</strong> Author experiment observations, deliberately separate from learner records.</li>
+<li><a href="../VALIDATION.md"><code>VALIDATION.md</code></a> — <strong>Read; tutor-maintained.</strong> Precisely what was tested and remaining limits.</li></ul></section>
+<p class="source">Primary reading: <a href="https://docs.python.org/3/library/unittest.html">official source for this lesson</a>. Also see <a href="../RESOURCES.md">annotated sources</a> and <a href="../reference/glossary.html">the glossary</a>. Ask the tutor a follow-up with your prediction, attempt and observed result whenever a step is unclear.</p>
+<div class="page-nav"><a href="0012-decisions.html">← Previous lesson</a><a href="../plan/assessment.md">Assessment →</a></div></main></body></html>

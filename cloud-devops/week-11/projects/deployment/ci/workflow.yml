@@ -1,0 +1,6 @@
+# LEARNER Lesson 8: inactive draft. Implement before installing in .github/workflows/.
+name: week11
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs: {}
