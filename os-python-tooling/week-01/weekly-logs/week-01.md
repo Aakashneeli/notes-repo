@@ -9,6 +9,9 @@ What I can already do without AI:
 What I find confusing:
 Time available per session:
 
+error 
+errors 
+errors hey 
 ## Session entry (copy for each session)
 
 - Date / lesson:
