@@ -50,3 +50,7 @@ The learner drill file starts unfinished. TODO output is expected. Run from this
 This Week 1 workspace was relocated to `os-python-tooling/week-01/` on 2026-09-10. Planning files now live in `plan/`, matching `python/week-02/`. Learner code, logs and progress were preserved. Historical notes can still mention the old location. Start commands from this weekly directory.
 
 See [relocation verification](VALIDATION.md) and the [read-only workspace checker](maintenance/verify_workspace.py).
+
+
+
+i want you so bad i go back on the things i believe , there i just said it scared you'll forget about me....... so young and full of lovin
